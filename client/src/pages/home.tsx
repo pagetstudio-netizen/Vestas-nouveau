@@ -158,7 +158,7 @@ export default function HomePage() {
       </div>
 
       {/* ── 3 QUICK ACTIONS ── */}
-      <div className="mx-3 mt-3 bg-white rounded-2xl shadow-sm px-4 py-5">
+      <div className="mx-3 mt-3 px-4 py-5">
         <div className="flex justify-around items-center">
           {/* Dépôt en ligne */}
           <button
