@@ -166,8 +166,18 @@ export default function HomePage() {
             className="flex flex-col items-center gap-1"
             data-testid="button-depot"
           >
-            <img src={iconRecharger} alt="Dépôt" className="w-8 h-8 object-contain"
-              style={{ filter: "sepia(1) saturate(6) hue-rotate(190deg) brightness(0.7)" }} />
+            <div style={{
+              width: 32, height: 32,
+              background: "#1565C0",
+              WebkitMaskImage: `url(${iconRecharger})`,
+              maskImage: `url(${iconRecharger})`,
+              WebkitMaskSize: "contain",
+              maskSize: "contain",
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+              WebkitMaskPosition: "center",
+              maskPosition: "center",
+            }} />
             <span className="text-gray-700 text-xs font-semibold text-center">Dépôt en ligne</span>
           </button>
 
@@ -177,8 +187,18 @@ export default function HomePage() {
             className="flex flex-col items-center gap-1"
             data-testid="button-retrait"
           >
-            <img src={iconRetraits} alt="Retrait" className="w-8 h-8 object-contain"
-              style={{ filter: "sepia(1) saturate(6) hue-rotate(190deg) brightness(0.7)" }} />
+            <div style={{
+              width: 32, height: 32,
+              background: "#1565C0",
+              WebkitMaskImage: `url(${iconRetraits})`,
+              maskImage: `url(${iconRetraits})`,
+              WebkitMaskSize: "contain",
+              maskSize: "contain",
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+              WebkitMaskPosition: "center",
+              maskPosition: "center",
+            }} />
             <span className="text-gray-700 text-xs font-semibold text-center">Retrait en ligne</span>
           </button>
 
@@ -188,8 +208,18 @@ export default function HomePage() {
             className="flex flex-col items-center gap-1"
             data-testid="button-aide"
           >
-            <img src={iconService} alt="Service" className="w-8 h-8 object-contain"
-              style={{ filter: "sepia(1) saturate(6) hue-rotate(190deg) brightness(0.7)" }} />
+            <div style={{
+              width: 32, height: 32,
+              background: "#1565C0",
+              WebkitMaskImage: `url(${iconService})`,
+              maskImage: `url(${iconService})`,
+              WebkitMaskSize: "contain",
+              maskSize: "contain",
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+              WebkitMaskPosition: "center",
+              maskPosition: "center",
+            }} />
             <span className="text-gray-700 text-xs font-semibold text-center">Service client</span>
           </button>
         </div>
