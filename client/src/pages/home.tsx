@@ -171,7 +171,7 @@ export default function HomePage() {
               style={{ background: "linear-gradient(135deg, #e3f0ff, #c5d9f8)" }}
             >
               <img src={iconRecharger} alt="Dépôt" className="w-9 h-9 object-contain"
-                style={{ filter: "invert(24%) sepia(96%) saturate(1200%) hue-rotate(200deg) brightness(90%)" }} />
+                style={{ filter: "brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(1500%) hue-rotate(205deg) brightness(90%)" }} />
             </div>
             <span className="text-gray-700 text-xs font-semibold text-center leading-tight">Dépôt<br />en ligne</span>
           </button>
@@ -187,7 +187,7 @@ export default function HomePage() {
               style={{ background: "linear-gradient(135deg, #e3f0ff, #c5d9f8)" }}
             >
               <img src={iconRetraits} alt="Retrait" className="w-9 h-9 object-contain"
-                style={{ filter: "invert(24%) sepia(96%) saturate(1200%) hue-rotate(200deg) brightness(90%)" }} />
+                style={{ filter: "brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(1500%) hue-rotate(205deg) brightness(90%)" }} />
             </div>
             <span className="text-gray-700 text-xs font-semibold text-center leading-tight">Retrait<br />en ligne</span>
           </button>
@@ -203,7 +203,7 @@ export default function HomePage() {
               style={{ background: "linear-gradient(135deg, #e3f0ff, #c5d9f8)" }}
             >
               <img src={iconService} alt="Service" className="w-9 h-9 object-contain"
-                style={{ filter: "invert(24%) sepia(96%) saturate(1200%) hue-rotate(200deg) brightness(90%)" }} />
+                style={{ filter: "brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(1500%) hue-rotate(205deg) brightness(90%)" }} />
             </div>
             <span className="text-gray-700 text-xs font-semibold text-center leading-tight">Service<br />client</span>
           </button>
