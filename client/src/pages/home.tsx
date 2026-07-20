@@ -167,7 +167,7 @@ export default function HomePage() {
             data-testid="button-depot"
           >
             <img src={iconRecharger} alt="Dépôt" className="w-8 h-8 object-contain"
-              style={{ filter: "brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(193deg) brightness(0.75)" }} />
+              style={{ filter: "sepia(1) saturate(6) hue-rotate(190deg) brightness(0.7)" }} />
             <span className="text-gray-700 text-xs font-semibold text-center">Dépôt en ligne</span>
           </button>
 
@@ -178,7 +178,7 @@ export default function HomePage() {
             data-testid="button-retrait"
           >
             <img src={iconRetraits} alt="Retrait" className="w-8 h-8 object-contain"
-              style={{ filter: "brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(193deg) brightness(0.75)" }} />
+              style={{ filter: "sepia(1) saturate(6) hue-rotate(190deg) brightness(0.7)" }} />
             <span className="text-gray-700 text-xs font-semibold text-center">Retrait en ligne</span>
           </button>
 
@@ -189,7 +189,7 @@ export default function HomePage() {
             data-testid="button-aide"
           >
             <img src={iconService} alt="Service" className="w-8 h-8 object-contain"
-              style={{ filter: "brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(193deg) brightness(0.75)" }} />
+              style={{ filter: "sepia(1) saturate(6) hue-rotate(190deg) brightness(0.7)" }} />
             <span className="text-gray-700 text-xs font-semibold text-center">Service client</span>
           </button>
         </div>
