@@ -230,7 +230,7 @@ export default function HomePage() {
         {/* Solde du compte — left card */}
         <div
           className="flex-1 px-4 py-5 flex flex-col justify-center"
-          style={{ background: "#fff", borderRadius: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
+          style={{ background: "#fff", borderRadius: 16, border: "1.5px solid #c5d9f8" }}
         >
           <p className="text-sm font-bold mb-3" style={{ color: "#1565C0" }}>
             Solde du compte
@@ -245,7 +245,7 @@ export default function HomePage() {
           {/* Revenu d'aujourd'hui */}
           <div
             className="px-4 py-4"
-            style={{ background: "#fff", borderRadius: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
+            style={{ background: "#fff", borderRadius: 16, border: "1.5px solid #c5d9f8" }}
           >
             <p className="text-[11px] font-semibold text-gray-500 mb-1">
               Revenu d'aujourd'hui
@@ -258,7 +258,7 @@ export default function HomePage() {
           {/* Revenu cumulé */}
           <div
             className="px-4 py-4"
-            style={{ background: "#fff", borderRadius: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
+            style={{ background: "#fff", borderRadius: 16, border: "1.5px solid #c5d9f8" }}
           >
             <p className="text-[11px] font-semibold text-gray-500 mb-1">
               Revenu cumulé
