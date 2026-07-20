@@ -158,45 +158,45 @@ export default function HomePage() {
       </div>
 
       {/* ── 3 QUICK ACTIONS ── */}
-      <div className="mx-3 mt-3 px-4 py-5">
+      <div className="mx-3 mt-1 px-4 py-2">
         <div className="flex justify-around items-center">
           {/* Dépôt en ligne */}
           <button
             onClick={() => navigate("/deposit")}
-            className="flex flex-col items-center gap-2"
+            className="flex flex-col items-center gap-1"
             data-testid="button-depot"
           >
             <img src={iconRecharger} alt="Dépôt" className="w-8 h-8 object-contain"
               style={{ filter: "brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(193deg) brightness(0.75)" }} />
-            <span className="text-gray-700 text-xs font-semibold text-center leading-tight">Dépôt<br />en ligne</span>
+            <span className="text-gray-700 text-xs font-semibold text-center">Dépôt en ligne</span>
           </button>
 
           {/* Retrait en ligne */}
           <button
             onClick={() => navigate("/withdrawal")}
-            className="flex flex-col items-center gap-2"
+            className="flex flex-col items-center gap-1"
             data-testid="button-retrait"
           >
             <img src={iconRetraits} alt="Retrait" className="w-8 h-8 object-contain"
               style={{ filter: "brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(193deg) brightness(0.75)" }} />
-            <span className="text-gray-700 text-xs font-semibold text-center leading-tight">Retrait<br />en ligne</span>
+            <span className="text-gray-700 text-xs font-semibold text-center">Retrait en ligne</span>
           </button>
 
           {/* Service client */}
           <button
             onClick={() => navigate("/service")}
-            className="flex flex-col items-center gap-2"
+            className="flex flex-col items-center gap-1"
             data-testid="button-aide"
           >
             <img src={iconService} alt="Service" className="w-8 h-8 object-contain"
               style={{ filter: "brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(193deg) brightness(0.75)" }} />
-            <span className="text-gray-700 text-xs font-semibold text-center leading-tight">Service<br />client</span>
+            <span className="text-gray-700 text-xs font-semibold text-center">Service client</span>
           </button>
         </div>
       </div>
 
       {/* ── BALANCE CARDS ── */}
-      <div className="mx-3 mt-3 flex gap-3">
+      <div className="mx-3 mt-1 flex gap-3">
         {/* Solde du compte — left card */}
         <div
           className="flex-1 px-4 py-5 flex flex-col justify-center"
