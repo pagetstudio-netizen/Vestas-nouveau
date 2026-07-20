@@ -2,57 +2,28 @@ import { useAuth } from "@/lib/auth";
 import { SiTelegram } from "react-icons/si";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { getCountryByCode, formatCurrency } from "@/lib/countries";
+import { useQuery } from "@tanstack/react-query";
+import { getCountryByCode } from "@/lib/countries";
 import { useToast } from "@/hooks/use-toast";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { Loader2, AlertTriangle } from "lucide-react";
-import type { Product } from "@shared/schema";
-
-import productImg1 from "@assets/téléchargement_(16)_1784561452683.jpeg";
-import productImg2 from "@assets/téléchargement_(20)_1784561452229.jpeg";
-import productImg3 from "@assets/téléchargement_(19)_1784561452588.jpeg";
-import productImg4 from "@assets/téléchargement_(18)_1784561452651.jpeg";
-import productImg5 from "@assets/doosan-dx-w-tractor-zandstra-société-à-amsterdam-les-pays-bas-_1784561452833.jpg";
-import productImg6 from "@assets/bundang-south-korea-june-28-260nw-2483425233_1784561452812.jpg";
-import productImg7 from "@assets/téléchargement_(14)_1784561452761.jpeg";
-import productImg8 from "@assets/téléchargement_(13)_1784561452786.jpeg";
-
-const PRODUCT_IMAGES = [
-  productImg1, productImg2, productImg3, productImg4,
-  productImg5, productImg6, productImg7, productImg8,
-];
 
 import jollibeeLogo from "@assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Corporation_-_Logo.s_1784561452870.png";
-import heroImg from "@assets/téléchargement_(16)_1784561452683.jpeg";
+import heroImg from "@assets/IMG_20260720_161655_874_1784565296696.jpg";
 import bellIcon from "@assets/d7d9f6f6-dddc-4071-8bc2-d6e7e589fbae_(1)_1783248684110.png";
 import iconRecharger from "@assets/1-1_1783245823715.png";
 import iconRetraits from "@assets/2-1_1783245823825.png";
 import iconService from "@assets/3-1_1783245823860.png";
-
-interface ProductWithOwnership extends Product {
-  isOwned?: boolean;
-  canClaimFree?: boolean;
-  ownedCount?: number;
-}
-
-const DARK_ICON = { filter: "brightness(0) saturate(100%)" } as React.CSSProperties;
+import bannerBottom from "@assets/téléchargement_(16)_1784561452683.jpeg";
 
 export default function HomePage() {
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [showPopup, setShowPopup] = useState(false);
-  const [confirmProduct, setConfirmProduct] = useState<ProductWithOwnership | null>(null);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [installed, setInstalled] = useState(false);
 
   const { data: settings } = useQuery<Record<string, string>>({
     queryKey: ["/api/settings"],
-  });
-
-  const { data: products } = useQuery<ProductWithOwnership[]>({
-    queryKey: ["/api/products"],
   });
 
   // Show popup on mount and every time home tab is clicked
@@ -72,28 +43,6 @@ export default function HomePage() {
     window.addEventListener("appinstalled", () => setInstalled(true));
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
-
-  const purchaseMutation = useMutation({
-    mutationFn: async (productId: number) => {
-      const response = await apiRequest("POST", `/api/products/${productId}/purchase`, {});
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Erreur lors de l'achat");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/user/products"] });
-      refreshUser();
-      setConfirmProduct(null);
-      toast({ title: "✅ Produit acheté !", description: "Vos gains débutent demain." });
-    },
-    onError: (error: any) => {
-      setConfirmProduct(null);
-      toast({ title: "Erreur", description: error.message, variant: "destructive" });
-    },
-  });
 
   const handleInstall = async () => {
     if (installed) {
@@ -118,15 +67,19 @@ export default function HomePage() {
   const country = getCountryByCode(user.country);
   const currency = country?.currency || "FCFA";
   const balance = parseFloat(user.balance || "0");
+  const todayEarnings = parseFloat(user.todayEarnings || "0");
+  const totalEarnings = parseFloat(user.totalEarnings || "0");
 
-  const paidProducts = products?.filter(p => !p.isFree) || [];
   const signupBonus = settings?.signupBonus || "500";
   const level1Commission = settings?.level1Commission || "25";
   const telegramGroupLink = settings?.groupLink || "https://t.me/doosangroup";
   const popupButtonLabel = settings?.popupButtonLabel || "Rejoindre notre groupe Telegram";
 
+  const fmt = (n: number) =>
+    n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
   return (
-    <div className="flex flex-col min-h-full" style={{ background: "#f0f2f5" }}>
+    <div className="flex flex-col min-h-full" style={{ background: "#eef2f7" }}>
 
       {/* ── POPUP NOTIFICATION ── */}
       {showPopup && (
@@ -140,15 +93,10 @@ export default function HomePage() {
             style={{ background: "#111827" }}
             onClick={e => e.stopPropagation()}
           >
-            {/* Bell icon */}
             <div className="flex justify-center pt-7 pb-2">
               <img src={bellIcon} alt="Notification" className="w-24 h-24 object-contain" />
             </div>
-
-            {/* Title */}
             <p className="text-white font-extrabold text-xl text-center tracking-widest mb-4">NOTIFICATION</p>
-
-            {/* Numbered list */}
             <div className="px-6 pb-2 space-y-2">
               {[
                 `Prime d'inscription : ${parseInt(signupBonus).toLocaleString()} FCFA.`,
@@ -163,8 +111,6 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-
-            {/* Buttons */}
             <div className="px-5 pt-5 pb-6 space-y-3">
               <button
                 onClick={() => setShowPopup(false)}
@@ -189,209 +135,127 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* ── Header ── */}
+      {/* ── HEADER ── */}
       <div className="flex items-center justify-between px-4 py-2 bg-white shadow-sm">
-        <img src={jollibeeLogo} alt="Doosan" className="h-10 w-auto object-contain" />
+        <img src={jollibeeLogo} alt="Doosan" className="h-9 w-auto object-contain" />
         <button
           onClick={() => navigate("/service")}
-          className="text-xs font-medium px-3 py-1.5 rounded-full bg-gray-100 text-gray-600"
+          className="text-xs font-bold px-4 py-2 rounded-full text-white"
+          style={{ background: "linear-gradient(135deg, #1565C0, #1E88E5)" }}
         >
-          Support
+          Récompenses quotidiennes
         </button>
       </div>
 
-      {/* ── Hero Banner ── */}
-      <div className="mx-3 mt-2">
-        <div className="relative w-full rounded-2xl overflow-hidden" style={{ height: 210 }}>
-          <img src={heroImg} alt="Doosan" className="w-full h-full object-cover" />
-        </div>
+      {/* ── HERO BANNER ── */}
+      <div className="w-full" style={{ height: 220 }}>
+        <img src={heroImg} alt="Doosan" className="w-full h-full object-cover" />
       </div>
 
-      {/* ── Quick Actions ── */}
-      <div className="mx-3 mt-3 bg-white rounded-2xl shadow-sm px-4 py-4">
+      {/* ── 3 QUICK ACTIONS ── */}
+      <div className="mx-3 mt-3 bg-white rounded-2xl shadow-sm px-4 py-5">
         <div className="flex justify-around items-center">
-          <button onClick={() => navigate("/deposit")} className="flex flex-col items-center gap-2" data-testid="button-depot">
-            <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
-              <img src={iconRecharger} alt="Dépôt" className="w-8 h-8 object-contain" style={DARK_ICON} />
+          {/* Dépôt en ligne */}
+          <button
+            onClick={() => navigate("/deposit")}
+            className="flex flex-col items-center gap-2"
+            data-testid="button-depot"
+          >
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg, #e3f0ff, #c5d9f8)" }}
+            >
+              <img src={iconRecharger} alt="Dépôt" className="w-9 h-9 object-contain"
+                style={{ filter: "invert(24%) sepia(96%) saturate(1200%) hue-rotate(200deg) brightness(90%)" }} />
             </div>
-            <span className="text-gray-700 text-xs font-medium">Recharger</span>
+            <span className="text-gray-700 text-xs font-semibold text-center leading-tight">Dépôt<br />en ligne</span>
           </button>
-          <button onClick={() => navigate("/withdrawal")} className="flex flex-col items-center gap-2" data-testid="button-retrait">
-            <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
-              <img src={iconRetraits} alt="Retrait" className="w-8 h-8 object-contain" style={DARK_ICON} />
+
+          {/* Retrait en ligne */}
+          <button
+            onClick={() => navigate("/withdrawal")}
+            className="flex flex-col items-center gap-2"
+            data-testid="button-retrait"
+          >
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg, #e3f0ff, #c5d9f8)" }}
+            >
+              <img src={iconRetraits} alt="Retrait" className="w-9 h-9 object-contain"
+                style={{ filter: "invert(24%) sepia(96%) saturate(1200%) hue-rotate(200deg) brightness(90%)" }} />
             </div>
-            <span className="text-gray-700 text-xs font-medium">Retirer</span>
+            <span className="text-gray-700 text-xs font-semibold text-center leading-tight">Retrait<br />en ligne</span>
           </button>
-          <button onClick={() => navigate("/service")} className="flex flex-col items-center gap-2" data-testid="button-aide">
-            <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
-              <img src={iconService} alt="Aide" className="w-8 h-8 object-contain" style={DARK_ICON} />
+
+          {/* Service client */}
+          <button
+            onClick={() => navigate("/service")}
+            className="flex flex-col items-center gap-2"
+            data-testid="button-aide"
+          >
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg, #e3f0ff, #c5d9f8)" }}
+            >
+              <img src={iconService} alt="Service" className="w-9 h-9 object-contain"
+                style={{ filter: "invert(24%) sepia(96%) saturate(1200%) hue-rotate(200deg) brightness(90%)" }} />
             </div>
-            <span className="text-gray-700 text-xs font-medium">Service Client</span>
+            <span className="text-gray-700 text-xs font-semibold text-center leading-tight">Service<br />client</span>
           </button>
         </div>
       </div>
 
-      {/* ── Produits ── */}
-      {paidProducts.length > 0 && (
-        <div className="mx-3 mt-4">
-          <div className="flex items-center justify-between mb-2.5">
-            <p className="text-gray-800 font-extrabold text-base">Nos Produits</p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            {paidProducts.map((product, idx) => {
-              const img = PRODUCT_IMAGES[idx % PRODUCT_IMAGES.length];
-              return (
-                <div
-                  key={product.id}
-                  className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col cursor-pointer active:scale-[0.98] transition-transform"
-                  onClick={() => setConfirmProduct(product)}
-                  data-testid={`home-product-card-${product.id}`}
-                >
-                  {/* Name */}
-                  <div className="text-center pt-3 pb-1 px-2">
-                    <p className="font-bold text-gray-800 text-sm">{product.name}</p>
-                  </div>
-
-                  {/* Image */}
-                  <div className="mx-2.5 rounded-xl overflow-hidden" style={{ height: 95 }}>
-                    <img src={img} alt={product.name} className="w-full h-full object-cover" />
-                  </div>
-
-                  {/* Stats */}
-                  <div className="px-3 pt-2 pb-1 space-y-0.5 flex-1">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-[10px]">Prix</span>
-                      <span className="font-bold text-[10px]" style={{ color: "#1565C0" }}>
-                        {currency} {Number(product.price).toLocaleString("fr-FR")}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-[10px]">Rev./jour</span>
-                      <span className="font-bold text-[10px]" style={{ color: "#1565C0" }}>
-                        {currency} {Number(product.dailyEarnings).toLocaleString("fr-FR")}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-[10px]">Rev. total</span>
-                      <span className="font-bold text-[10px]" style={{ color: "#1565C0" }}>
-                        {currency} {Number(product.totalReturn).toLocaleString("fr-FR")}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-[10px]">Durée</span>
-                      <span className="font-bold text-[10px]" style={{ color: "#1565C0" }}>
-                        {product.cycleDays} jours
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Buy button */}
-                  <div className="px-2.5 pb-3 pt-2">
-                    <div
-                      className="w-full py-2 rounded-xl text-center text-white text-xs font-bold"
-                      style={{ background: "linear-gradient(135deg, #1565C0, #1E88E5)" }}
-                    >
-                      Acheter
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      <div className="pb-24" />
-
-      {/* ── Purchase confirm modal ── */}
-      {confirmProduct && (
+      {/* ── BALANCE CARDS ── */}
+      <div className="mx-3 mt-3 flex gap-3">
+        {/* Solde du compte — left card */}
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center px-5 bg-black/60"
-          onClick={() => setConfirmProduct(null)}
+          className="flex-1 rounded-2xl px-4 py-5 shadow-sm flex flex-col justify-center"
+          style={{ background: "#fff" }}
         >
+          <p className="text-sm font-bold mb-3" style={{ color: "#1565C0" }}>
+            Solde du compte
+          </p>
+          <p className="text-xl font-extrabold" style={{ color: "#1565C0" }}>
+            {currency} {fmt(balance)}
+          </p>
+        </div>
+
+        {/* Right column — two stacked mini cards */}
+        <div className="flex-1 flex flex-col gap-3">
+          {/* Revenu d'aujourd'hui */}
           <div
-            className="w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl"
-            style={{ background: "linear-gradient(160deg, #1565C0 0%, #0D47A1 100%)" }}
-            onClick={e => e.stopPropagation()}
+            className="rounded-2xl px-4 py-4 shadow-sm"
+            style={{ background: "#EBF3FF" }}
           >
-            {/* Title */}
-            <div className="pt-6 px-6 pb-3">
-              <h3 className="text-white text-2xl font-black">{confirmProduct.name}</h3>
-              <p className="text-white/70 text-sm mt-1">
-                Vos gains seront crédités toutes les 24 heures.
-              </p>
-            </div>
+            <p className="text-[11px] font-semibold text-gray-500 mb-1">
+              Revenu d'aujourd'hui
+            </p>
+            <p className="text-base font-extrabold" style={{ color: "#1565C0" }}>
+              {currency} {fmt(todayEarnings)}
+            </p>
+          </div>
 
-            {/* Image + Info */}
-            <div className="flex items-center gap-4 px-6 py-3">
-              <div className="w-28 h-24 rounded-2xl overflow-hidden shrink-0 shadow-lg">
-                <img
-                  src={PRODUCT_IMAGES[((confirmProduct.sortOrder ?? 0)) % PRODUCT_IMAGES.length]}
-                  alt={confirmProduct.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex-1 space-y-2">
-                <div>
-                  <p className="text-white/60 text-xs">Prix</p>
-                  <p className="text-white font-bold text-sm">{currency} {Number(confirmProduct.price).toLocaleString("fr-FR")}</p>
-                </div>
-                <div>
-                  <p className="text-white/60 text-xs">Revenu quotidien</p>
-                  <p className="text-white font-bold text-sm">{currency} {Number(confirmProduct.dailyEarnings).toLocaleString("fr-FR")}</p>
-                </div>
-                <div>
-                  <p className="text-white/60 text-xs">Revenu total</p>
-                  <p className="text-white font-bold text-sm">{currency} {Number(confirmProduct.totalReturn).toLocaleString("fr-FR")}</p>
-                </div>
-                <div>
-                  <p className="text-white/60 text-xs">Période</p>
-                  <p className="text-white font-bold text-sm">{confirmProduct.cycleDays} jours</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Warning / info */}
-            <div className="mx-6 mb-3">
-              {balance < Number(confirmProduct.price) ? (
-                <div className="flex items-center gap-2 p-3 rounded-2xl" style={{ background: "rgba(239,68,68,0.2)" }}>
-                  <AlertTriangle className="w-4 h-4 text-red-300 shrink-0" />
-                  <p className="text-xs text-red-200">
-                    Solde insuffisant. Il vous manque {formatCurrency(Number(confirmProduct.price) - balance, user.country)}.
-                  </p>
-                </div>
-              ) : (
-                <p className="text-white/60 text-xs text-center">
-                  Chaque personne ne peut acheter qu'un seul article par jour.
-                </p>
-              )}
-            </div>
-
-            {/* Buttons */}
-            <div className="flex gap-3 px-6 pb-6 pt-1">
-              <button
-                onClick={() => setConfirmProduct(null)}
-                className="flex-1 py-3 rounded-2xl font-semibold text-sm"
-                style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)" }}
-                data-testid="button-cancel-purchase"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={() => purchaseMutation.mutate(confirmProduct.id)}
-                disabled={purchaseMutation.isPending || balance < Number(confirmProduct.price)}
-                className="flex-1 py-3 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-1 disabled:opacity-50"
-                style={{ background: "linear-gradient(135deg, #1E88E5, #004499)" }}
-                data-testid="button-confirm-purchase"
-              >
-                {purchaseMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                Confirmer
-              </button>
-            </div>
+          {/* Revenu cumulé */}
+          <div
+            className="rounded-2xl px-4 py-4 shadow-sm"
+            style={{ background: "#EBF3FF" }}
+          >
+            <p className="text-[11px] font-semibold text-gray-500 mb-1">
+              Revenu cumulé
+            </p>
+            <p className="text-base font-extrabold" style={{ color: "#1565C0" }}>
+              {currency} {fmt(totalEarnings)}
+            </p>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* ── BOTTOM DECORATIVE BANNER ── */}
+      <div className="mx-3 mt-3 rounded-2xl overflow-hidden shadow-sm" style={{ height: 180 }}>
+        <img src={bannerBottom} alt="Doosan" className="w-full h-full object-cover" />
+      </div>
+
+      <div className="pb-28" />
     </div>
   );
 }
