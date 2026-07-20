@@ -166,13 +166,8 @@ export default function HomePage() {
             className="flex flex-col items-center gap-2"
             data-testid="button-depot"
           >
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #e3f0ff, #c5d9f8)" }}
-            >
-              <img src={iconRecharger} alt="Dépôt" className="w-9 h-9 object-contain"
-                style={{ filter: "brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(193deg) brightness(0.75)" }} />
-            </div>
+            <img src={iconRecharger} alt="Dépôt" className="w-8 h-8 object-contain"
+              style={{ filter: "brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(193deg) brightness(0.75)" }} />
             <span className="text-gray-700 text-xs font-semibold text-center leading-tight">Dépôt<br />en ligne</span>
           </button>
 
@@ -182,13 +177,8 @@ export default function HomePage() {
             className="flex flex-col items-center gap-2"
             data-testid="button-retrait"
           >
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #e3f0ff, #c5d9f8)" }}
-            >
-              <img src={iconRetraits} alt="Retrait" className="w-9 h-9 object-contain"
-                style={{ filter: "brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(193deg) brightness(0.75)" }} />
-            </div>
+            <img src={iconRetraits} alt="Retrait" className="w-8 h-8 object-contain"
+              style={{ filter: "brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(193deg) brightness(0.75)" }} />
             <span className="text-gray-700 text-xs font-semibold text-center leading-tight">Retrait<br />en ligne</span>
           </button>
 
@@ -198,13 +188,8 @@ export default function HomePage() {
             className="flex flex-col items-center gap-2"
             data-testid="button-aide"
           >
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #e3f0ff, #c5d9f8)" }}
-            >
-              <img src={iconService} alt="Service" className="w-9 h-9 object-contain"
-                style={{ filter: "brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(193deg) brightness(0.75)" }} />
-            </div>
+            <img src={iconService} alt="Service" className="w-8 h-8 object-contain"
+              style={{ filter: "brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(193deg) brightness(0.75)" }} />
             <span className="text-gray-700 text-xs font-semibold text-center leading-tight">Service<br />client</span>
           </button>
         </div>
