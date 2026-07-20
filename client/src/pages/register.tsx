@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { FALLBACK_COUNTRIES, type ApiCountry } from "@/lib/countries";
 import { CountrySelector } from "@/components/country-selector";
 import { Loader2 } from "lucide-react";
-import intelLogo from "@assets/vestas-logo_1783210030332.png";
+import intelLogo from "@assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Corporation_-_Logo.s_1784561452870.png";
 
 const registerSchema = z.object({
   phone: z.string().min(8, "Numéro de téléphone invalide"),
@@ -81,7 +81,7 @@ export default function RegisterPage() {
         password: data.password,
         invitationCode: data.invitationCode,
       });
-      toast({ title: "Inscription réussie !", description: "Bienvenue sur Vestas !" });
+      toast({ title: "Inscription réussie !", description: "Bienvenue sur Doosan !" });
       navigate("/");
     } catch (error: any) {
       toast({ title: "Erreur d'inscription", description: error.message || "Une erreur est survenue", variant: "destructive" });
@@ -99,7 +99,7 @@ export default function RegisterPage() {
 
         {/* Logo */}
         <div className="flex justify-center mb-10">
-          <img src={intelLogo} alt="Vestas" className="w-28 h-28 object-contain" />
+          <img src={intelLogo} alt="Doosan" className="w-28 h-28 object-contain" />
         </div>
 
         {/* Fields */}

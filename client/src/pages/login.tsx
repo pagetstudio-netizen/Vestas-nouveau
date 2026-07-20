@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { FALLBACK_COUNTRIES, type ApiCountry } from "@/lib/countries";
 import { CountrySelector } from "@/components/country-selector";
 import { Loader2 } from "lucide-react";
-import intelLogo from "@assets/vestas-logo_1783210030332.png";
+import intelLogo from "@assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Corporation_-_Logo.s_1784561452870.png";
 
 const loginSchema = z.object({
   phone: z.string().min(8, "Numéro de téléphone invalide"),
@@ -26,7 +26,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [countryModalOpen, setCountryModalOpen] = useState(false);
 
-  const savedCredentials = typeof window !== "undefined" ? localStorage.getItem("vestas_credentials") : null;
+  const savedCredentials = typeof window !== "undefined" ? localStorage.getItem("doosan_credentials") : null;
   const parsedCredentials = savedCredentials ? JSON.parse(savedCredentials) : null;
   const [rememberMe, setRememberMe] = useState(!!parsedCredentials);
 
@@ -69,9 +69,9 @@ export default function LoginPage() {
     try {
       await login(data.phone, data.country, data.password);
       if (rememberMe) {
-        localStorage.setItem("vestas_credentials", JSON.stringify({ phone: data.phone, country: data.country, password: data.password }));
+        localStorage.setItem("doosan_credentials", JSON.stringify({ phone: data.phone, country: data.country, password: data.password }));
       } else {
-        localStorage.removeItem("vestas_credentials");
+        localStorage.removeItem("doosan_credentials");
       }
       navigate("/");
     } catch (error: any) {
@@ -90,7 +90,7 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="flex justify-center mb-14">
-          <img src={intelLogo} alt="Vestas" className="w-32 h-32 object-contain" />
+          <img src={intelLogo} alt="Doosan" className="w-32 h-32 object-contain" />
         </div>
 
         {/* Fields */}

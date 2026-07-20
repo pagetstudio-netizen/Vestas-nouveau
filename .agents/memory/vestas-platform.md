@@ -1,24 +1,31 @@
 ---
-name: Vestas Platform Setup
-description: Key decisions, branding, colors, assets, and DB quirks for this investment platform rebranded as Vestas.
+name: Doosan Platform Setup
+description: Key decisions, branding, colors, assets, and DB quirks for this investment platform rebranded as Doosan.
 ---
 
 ## Brand Identity
-- **Name**: Vestas (leader mondial de l'énergie éolienne)
-- **Primary color**: `#003366` (Vestas navy blue), darker variant `#002244`
-- **CSS HSL primary**: `210 100% 20%` (light mode), `210 100% 40%` (dark mode)
-- **Theme-color meta**: `#003366`
-- **Logo**: `attached_assets/vestas-logo_1783210030332.png` (horizontal)
-- **Favicon**: `attached_assets/vestas-favicon_1783210030432.png` (square) → copied to `client/public/favicon.png`
+- **Name**: Doosan (leader mondial de la robotique et industrie lourde)
+- **Primary color**: `#1565C0` (Doosan vivid blue), darker variant `#0D47A1`
+- **CSS HSL primary**: `211 78% 42%` (Doosan blue)
+- **Theme-color meta**: `#1565C0`
+- **Logo**: `attached_assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Corporation_-_Logo.s_1784561452870.png` (horizontal, blue on white)
+- **Favicon**: `attached_assets/channels4_profile_1784561452890.jpg` (square, white DOOSAN on blue) → copied to `client/public/favicon.png`
 - **@assets alias** resolves to `attached_assets/` (configured in vite.config.ts)
 
-## Hero Images
-- Wind turbine images in `attached_assets/`: `vestas_112v_closeup_1783210181172.jpg`, `vestas_112v_closeup_(1)_1783210181118.jpg`, `vestas_112v_closeup_(2)_1783210180090.jpg`
+## Hero & Product Images (Doosan)
+- Hero: `attached_assets/téléchargement_(16)_1784561452683.jpeg` (Doosan Robotics booth)
+- Product images: `téléchargement_(13)` through `téléchargement_(20)` + doosan-dx-w-tractor + bundang-south-korea files
 
 ## Known DB Issues (pre-existing, unrelated to branding)
-- Supabase schema not migrated; seed errors for missing tables (users, deposits, user_products, user_stakings) appear in logs but don't crash the server. Server continues on port 5000.
+- Supabase replaced by Replit built-in PostgreSQL (`DATABASE_URL`)
+- Settings (supportLink, etc.) in DB still showed vestasgroup after restart — updated directly via SQL
 
 ## Countries
 - Defaults to TD (Tchad) and NE (Niger)
 
-**Why:** Platform was rebranded from Intel to Vestas; all Intel/Jollibee references removed from user-visible UI. Telegram fallback links use `vestasgroup` placeholder.
+## Rebranding History
+- Intel → Vestas (wind energy) → Doosan (robotics/heavy industry)
+- All color references changed: `#003366` → `#1565C0`, `#002244` → `#0D47A1`
+- Telegram fallback links: `vestasgroup` → `doosangroup`
+
+**Why:** Platform rebranded to Doosan; all Vestas/wind energy references removed from user-visible UI.

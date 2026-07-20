@@ -1,1 +1,1 @@
-- [Vestas Platform Setup](vestas-platform.md) — Platform rebranded from Intel/Jollibee → Vestas (wind energy). Key colors, assets, and DB quirks documented.
+- [Doosan Platform Setup](vestas-platform.md) — Platform rebranded Intel→Vestas→Doosan (robotics). Key colors, assets, and DB quirks documented.

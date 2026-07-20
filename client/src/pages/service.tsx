@@ -10,7 +10,7 @@ import {
   SiYoutube,
 } from "react-icons/si";
 
-import heroImg from "@assets/vestas_112v_closeup_1783210181172.jpg";
+import heroImg from "@assets/téléchargement_(16)_1784561452683.jpeg";
 
 interface LinksSettings {
   supportLink: string;
@@ -94,28 +94,28 @@ export default function ServicePage() {
     {
       label: settings?.supportLabel || "Service client",
       type: settings?.supportType || "telegram",
-      href: settings?.supportLink || "https://t.me/vestasgroup",
+      href: settings?.supportLink || "https://t.me/doosangroup",
       testId: "button-support-link",
       enabled: settings?.supportEnabled !== "false",
     },
     {
       label: settings?.support2Label || "Service client 2",
       type: settings?.support2Type || "telegram",
-      href: settings?.support2Link || "https://t.me/vestasgroup",
+      href: settings?.support2Link || "https://t.me/doosangroup",
       testId: "button-support2-link",
       enabled: settings?.support2Enabled !== "false",
     },
     {
       label: settings?.channelLabel || "Chaîne officielle",
       type: settings?.channelType || "telegram",
-      href: settings?.channelLink || "https://t.me/vestasgroup",
+      href: settings?.channelLink || "https://t.me/doosangroup",
       testId: "button-channel-link",
       enabled: settings?.channelEnabled !== "false",
     },
     {
       label: settings?.groupLabel || "Groupe de discussion",
       type: settings?.groupType || "telegram",
-      href: settings?.groupLink || "https://t.me/vestasgroup",
+      href: settings?.groupLink || "https://t.me/doosangroup",
       testId: "button-group-link",
       enabled: settings?.groupEnabled !== "false",
     },
@@ -141,7 +141,7 @@ export default function ServicePage() {
       <div className="w-full" style={{ height: 220 }}>
         <img
           src={heroImg}
-          alt="Vestas"
+          alt="Doosan"
           className="w-full h-full object-cover"
           data-testid="img-service-hero"
         />

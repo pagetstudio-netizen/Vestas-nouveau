@@ -1,11 +1,11 @@
 {
-  "name": "Vestas",
-  "short_name": "Vestas",
-  "description": "Vestas est le leader mondial du secteur de l'énergie éolienne. Investissez et générez des revenus quotidiens.",
+  "name": "Doosan",
+  "short_name": "Doosan",
+  "description": "Doosan est un leader mondial de la robotique et de l'industrie lourde. Investissez et générez des revenus quotidiens.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#003366",
+  "theme_color": "#1565C0",
   "orientation": "portrait",
   "icons": [
     {

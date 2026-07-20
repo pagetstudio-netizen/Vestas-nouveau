@@ -178,16 +178,16 @@ export async function seed() {
   // Check if settings exist - apply new values for new keys or update existing
   const existingSettings = await db.select().from(platformSettings);
   const requiredSettings = [
-    { key: "supportLink", value: "https://t.me/vestasgroup" },
+    { key: "supportLink", value: "https://t.me/doosangroup" },
     { key: "supportType", value: "telegram" },
     { key: "supportLabel", value: "Service client" },
-    { key: "support2Link", value: "https://t.me/vestasgroup" },
+    { key: "support2Link", value: "https://t.me/doosangroup" },
     { key: "support2Type", value: "telegram" },
     { key: "support2Label", value: "Service client 2" },
-    { key: "channelLink", value: "https://t.me/vestasgroup" },
+    { key: "channelLink", value: "https://t.me/doosangroup" },
     { key: "channelType", value: "telegram" },
     { key: "channelLabel", value: "Chaîne officielle" },
-    { key: "groupLink", value: "https://t.me/vestasgroup" },
+    { key: "groupLink", value: "https://t.me/doosangroup" },
     { key: "groupType", value: "telegram" },
     { key: "groupLabel", value: "Groupe de discussion" },
     { key: "popupButtonLabel", value: "Cliquez ici pour rejoindre le groupe Telegram" },

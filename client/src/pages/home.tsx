@@ -9,22 +9,22 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Loader2, AlertTriangle } from "lucide-react";
 import type { Product } from "@shared/schema";
 
-import productImg1 from "@assets/vestas_112v_closeup_1783210181172.jpg";
-import productImg2 from "@assets/vestas_112v_closeup_(1)_1783210181118.jpg";
-import productImg3 from "@assets/vestas_112v_closeup_(2)_1783210180090.jpg";
-import productImg4 from "@assets/images_(50)_1783210180466.jpeg";
-import productImg5 from "@assets/images_(41)_1783210181134.jpeg";
-import productImg6 from "@assets/images_(49)_1783210181155.jpeg";
-import productImg7 from "@assets/images_(40)_1783210181193.jpeg";
-import productImg8 from "@assets/images_(39)_1783210181215.jpeg";
+import productImg1 from "@assets/téléchargement_(16)_1784561452683.jpeg";
+import productImg2 from "@assets/téléchargement_(20)_1784561452229.jpeg";
+import productImg3 from "@assets/téléchargement_(19)_1784561452588.jpeg";
+import productImg4 from "@assets/téléchargement_(18)_1784561452651.jpeg";
+import productImg5 from "@assets/doosan-dx-w-tractor-zandstra-société-à-amsterdam-les-pays-bas-_1784561452833.jpg";
+import productImg6 from "@assets/bundang-south-korea-june-28-260nw-2483425233_1784561452812.jpg";
+import productImg7 from "@assets/téléchargement_(14)_1784561452761.jpeg";
+import productImg8 from "@assets/téléchargement_(13)_1784561452786.jpeg";
 
 const PRODUCT_IMAGES = [
   productImg1, productImg2, productImg3, productImg4,
   productImg5, productImg6, productImg7, productImg8,
 ];
 
-import jollibeeLogo from "@assets/vestas-logo_1783210030332.png";
-import heroImg from "@assets/vestas_112v_closeup_1783210181172.jpg";
+import jollibeeLogo from "@assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Corporation_-_Logo.s_1784561452870.png";
+import heroImg from "@assets/téléchargement_(16)_1784561452683.jpeg";
 import bellIcon from "@assets/d7d9f6f6-dddc-4071-8bc2-d6e7e589fbae_(1)_1783248684110.png";
 import iconRecharger from "@assets/1-1_1783245823715.png";
 import iconRetraits from "@assets/2-1_1783245823825.png";
@@ -122,7 +122,7 @@ export default function HomePage() {
   const paidProducts = products?.filter(p => !p.isFree) || [];
   const signupBonus = settings?.signupBonus || "500";
   const level1Commission = settings?.level1Commission || "25";
-  const telegramGroupLink = settings?.groupLink || "https://t.me/vestasgroup";
+  const telegramGroupLink = settings?.groupLink || "https://t.me/doosangroup";
   const popupButtonLabel = settings?.popupButtonLabel || "Rejoindre notre groupe Telegram";
 
   return (
@@ -155,7 +155,7 @@ export default function HomePage() {
                 `Récompense de connexion quotidienne : 50 FCFA.`,
                 `Invitez vos subordonnés à investir et recevez une récompense en espèces de ${level1Commission}% du montant de leur investissement.`,
                 `Il n'y a aucune limite quant au temps de retrait ou au nombre de retraits. Vous pouvez retirer de l'argent à tout moment.`,
-                `Vestas attache une grande importance au marché.`,
+                `Doosan attache une grande importance au marché.`,
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-2">
                   <span className="text-white/60 text-xs font-bold mt-0.5 shrink-0">{i + 1}.</span>
@@ -191,7 +191,7 @@ export default function HomePage() {
 
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-4 py-2 bg-white shadow-sm">
-        <img src={jollibeeLogo} alt="Vestas" className="h-10 w-auto object-contain" />
+        <img src={jollibeeLogo} alt="Doosan" className="h-10 w-auto object-contain" />
         <button
           onClick={() => navigate("/service")}
           className="text-xs font-medium px-3 py-1.5 rounded-full bg-gray-100 text-gray-600"
@@ -203,7 +203,7 @@ export default function HomePage() {
       {/* ── Hero Banner ── */}
       <div className="mx-3 mt-2">
         <div className="relative w-full rounded-2xl overflow-hidden" style={{ height: 210 }}>
-          <img src={heroImg} alt="Vestas" className="w-full h-full object-cover" />
+          <img src={heroImg} alt="Doosan" className="w-full h-full object-cover" />
         </div>
       </div>
 
@@ -262,25 +262,25 @@ export default function HomePage() {
                   <div className="px-3 pt-2 pb-1 space-y-0.5 flex-1">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400 text-[10px]">Prix</span>
-                      <span className="font-bold text-[10px]" style={{ color: "#003366" }}>
+                      <span className="font-bold text-[10px]" style={{ color: "#1565C0" }}>
                         {currency} {Number(product.price).toLocaleString("fr-FR")}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400 text-[10px]">Rev./jour</span>
-                      <span className="font-bold text-[10px]" style={{ color: "#003366" }}>
+                      <span className="font-bold text-[10px]" style={{ color: "#1565C0" }}>
                         {currency} {Number(product.dailyEarnings).toLocaleString("fr-FR")}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400 text-[10px]">Rev. total</span>
-                      <span className="font-bold text-[10px]" style={{ color: "#003366" }}>
+                      <span className="font-bold text-[10px]" style={{ color: "#1565C0" }}>
                         {currency} {Number(product.totalReturn).toLocaleString("fr-FR")}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400 text-[10px]">Durée</span>
-                      <span className="font-bold text-[10px]" style={{ color: "#003366" }}>
+                      <span className="font-bold text-[10px]" style={{ color: "#1565C0" }}>
                         {product.cycleDays} jours
                       </span>
                     </div>
@@ -290,7 +290,7 @@ export default function HomePage() {
                   <div className="px-2.5 pb-3 pt-2">
                     <div
                       className="w-full py-2 rounded-xl text-center text-white text-xs font-bold"
-                      style={{ background: "linear-gradient(135deg, #003366, #005599)" }}
+                      style={{ background: "linear-gradient(135deg, #1565C0, #1E88E5)" }}
                     >
                       Acheter
                     </div>
@@ -312,7 +312,7 @@ export default function HomePage() {
         >
           <div
             className="w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl"
-            style={{ background: "linear-gradient(160deg, #003366 0%, #001428 100%)" }}
+            style={{ background: "linear-gradient(160deg, #1565C0 0%, #0D47A1 100%)" }}
             onClick={e => e.stopPropagation()}
           >
             {/* Title */}
@@ -382,7 +382,7 @@ export default function HomePage() {
                 onClick={() => purchaseMutation.mutate(confirmProduct.id)}
                 disabled={purchaseMutation.isPending || balance < Number(confirmProduct.price)}
                 className="flex-1 py-3 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-1 disabled:opacity-50"
-                style={{ background: "linear-gradient(135deg, #0066cc, #004499)" }}
+                style={{ background: "linear-gradient(135deg, #1E88E5, #004499)" }}
                 data-testid="button-confirm-purchase"
               >
                 {purchaseMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}

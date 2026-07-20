@@ -5,8 +5,8 @@ import { getCountryByCode } from "@/lib/countries";
 import { useLocation } from "wouter";
 import { Copy } from "lucide-react";
 
-import lv1Img from "@assets/vestas_112v_closeup_(1)_1783210181118.jpg";
-import lv2Img from "@assets/vestas_112v_closeup_(2)_1783210180090.jpg";
+import lv1Img from "@assets/téléchargement_(20)_1784561452229.jpeg";
+import lv2Img from "@assets/téléchargement_(19)_1784561452588.jpeg";
 import teamIcon from "@assets/1244758_1783246767217.png";
 
 interface TeamStats {
