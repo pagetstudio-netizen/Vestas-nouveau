@@ -7,7 +7,7 @@ import { getCountryByCode } from "@/lib/countries";
 import { useToast } from "@/hooks/use-toast";
 
 import jollibeeLogo from "@assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Corporation_-_Logo.s_1784561452870.png";
-import heroImg from "@assets/IMG_20260720_161655_874_1784565296696.jpg";
+import heroImg from "@assets/téléchargement_(16)_1784561452683.jpeg";
 import bellIcon from "@assets/d7d9f6f6-dddc-4071-8bc2-d6e7e589fbae_(1)_1783248684110.png";
 import iconRecharger from "@assets/1-1_1783245823715.png";
 import iconRetraits from "@assets/2-1_1783245823825.png";
@@ -137,9 +137,14 @@ export default function HomePage() {
 
       {/* ── HEADER ── */}
       <div className="flex items-center justify-between px-4 py-2 bg-white shadow-sm">
-        <img src={jollibeeLogo} alt="Doosan" className="h-9 w-auto object-contain" />
+        <img
+          src={jollibeeLogo}
+          alt="Doosan"
+          className="h-9 w-auto object-contain cursor-pointer"
+          onClick={() => navigate("/")}
+        />
         <button
-          onClick={() => navigate("/service")}
+          onClick={() => navigate("/tasks")}
           className="text-xs font-bold px-4 py-2 rounded-full text-white"
           style={{ background: "linear-gradient(135deg, #1565C0, #1E88E5)" }}
         >
