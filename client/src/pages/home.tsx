@@ -136,16 +136,16 @@ export default function HomePage() {
       )}
 
       {/* ── HEADER ── */}
-      <div className="flex items-center justify-between px-4 py-2 bg-white shadow-sm">
+      <div className="flex items-center justify-between px-4 py-1.5 bg-white shadow-sm">
         <img
           src={jollibeeLogo}
           alt="Doosan"
-          className="h-9 w-auto object-contain cursor-pointer"
+          className="h-6 w-auto object-contain cursor-pointer"
           onClick={() => navigate("/")}
         />
         <button
           onClick={() => navigate("/tasks")}
-          className="text-xs font-bold px-4 py-2 rounded-full text-white"
+          className="text-[10px] font-bold px-3 py-1 rounded-full text-white"
           style={{ background: "linear-gradient(135deg, #1565C0, #1E88E5)" }}
         >
           Récompenses quotidiennes
