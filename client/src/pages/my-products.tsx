@@ -10,8 +10,6 @@ import type { Product } from "@shared/schema";
 
 import vestasLogo from "@assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Corporation_-_Logo.s_1784561452870.png";
 import serviceIcon from "@assets/20260311_214852_1773265973964.png";
-import btnOurProducts from "@assets/20260721_173328_1784656524037.png";
-import btnMyProduct from "@assets/20260721_173249_1784656523987.png";
 
 import productImg1 from "@assets/téléchargement_(16)_1784561452683.jpeg";
 import productImg2 from "@assets/téléchargement_(20)_1784561452229.jpeg";
@@ -126,30 +124,26 @@ export default function MyProductsPage() {
       {/* Tab toggle buttons */}
       <div className="flex gap-3 px-4 pt-4 pb-2 shrink-0">
         <button
-          className="flex-1 relative"
-          style={{ height: 52 }}
+          className="flex-1 py-3 rounded-xl font-bold text-sm transition-all"
+          style={{
+            background: activeTab === "our" ? "linear-gradient(135deg, #22c55e, #16a34a)" : "#e5e7eb",
+            color: activeTab === "our" ? "#fff" : "#6b7280",
+          }}
           onClick={() => setActiveTab("our")}
           data-testid="tab-our-products"
         >
-          <img
-            src={btnOurProducts}
-            alt="our products"
-            className="w-full h-full object-contain"
-            style={{ opacity: activeTab === "our" ? 1 : 0.45 }}
-          />
+          our products
         </button>
         <button
-          className="flex-1 relative"
-          style={{ height: 52 }}
+          className="flex-1 py-3 rounded-xl font-bold text-sm transition-all"
+          style={{
+            background: activeTab === "my" ? "linear-gradient(135deg, #22c55e, #16a34a)" : "#e5e7eb",
+            color: activeTab === "my" ? "#fff" : "#6b7280",
+          }}
           onClick={() => setActiveTab("my")}
           data-testid="tab-my-product"
         >
-          <img
-            src={btnMyProduct}
-            alt="my product"
-            className="w-full h-full object-contain"
-            style={{ opacity: activeTab === "my" ? 1 : 0.45 }}
-          />
+          my product
         </button>
       </div>
 
@@ -239,20 +233,6 @@ export default function MyProductsPage() {
         {/* ── MY PRODUCT tab ── */}
         {activeTab === "my" && (
           <div className="mt-1">
-            {/* Green sub-header */}
-            <div
-              className="flex items-center gap-3 px-3 py-3 rounded-2xl mb-3"
-              style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}
-            >
-              <button
-                onClick={() => setActiveTab("our")}
-                className="w-8 h-8 flex items-center justify-center bg-white/20 rounded-lg shrink-0"
-              >
-                <span className="text-white font-bold text-lg leading-none">&lt;</span>
-              </button>
-              <p className="text-white font-bold text-base flex-1 text-center pr-8">Mon produit</p>
-            </div>
-
             {/* Three sub-tabs */}
             <div className="flex gap-1 mb-3 bg-white rounded-xl p-1 shadow-sm">
               {(["fixes", "bientot", "commandes"] as const).map((tab) => {
