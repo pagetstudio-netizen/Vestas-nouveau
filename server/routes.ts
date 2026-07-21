@@ -13,6 +13,18 @@ import {
   mapSoleaspayStatus,
   SOLEASPAY_SERVICE_MAP 
 } from "./soleaspay";
+import {
+  createPayment as sendavapayCreate,
+  initiatePayment as sendavapayInitiate,
+  submitOtp as sendavapaySubmitOtp,
+  verifyPayment as sendavapayVerify,
+  verifyWebhookSignature as sendavapayVerifySignature,
+  mapSendavapayStatus,
+  formatPhone as sendavapayFormatPhone,
+  getCurrency as sendavapayGetCurrency,
+  toSendavapayCountry,
+} from "./sendavapay";
+import express from "express";
 
 // --- Brute-force protection (in-memory) ---
 const loginAttempts = new Map<string, { count: number; blockedUntil: number }>();
@@ -454,8 +466,20 @@ export async function registerRoutes(
 
       const soleaspayEnabled = settings.soleaspayEnabled === "true";
       const soleaspayChannelName = settings.soleaspayChannelName || "Westpay";
+      const sendavapayEnabled = settings.sendavapayEnabled === "true";
+      const sendavapayChannelName = settings.sendavapayChannelName || "SendavaPay";
       // Build virtual gateway channels when enabled in settings
       const virtualChannels: any[] = [];
+      if (sendavapayEnabled) {
+        virtualChannels.push({
+          id: -2,
+          name: sendavapayChannelName,
+          redirectUrl: "",
+          isApi: true,
+          isActive: true,
+          gateway: "sendavapay",
+        });
+      }
       if (soleaspayEnabled) {
         virtualChannels.push({
           id: -1,
@@ -836,6 +860,244 @@ export async function registerRoutes(
       res.status(500).json({ message: error.message });
     }
   });
+
+  // ── SendavaPay routes ──────────────────────────────────────────────────────
+
+  // Proxy: operators for a given country (public SendavaPay endpoint)
+  app.get("/api/sendavapay/operators/:country", requireAuth, async (req, res) => {
+    try {
+      const svCountry = toSendavapayCountry(req.params.country);
+      const r = await fetch(
+        `https://sendavapay.com/api/sdk/v1/operators/${svCountry}`
+      );
+      const data = await r.json();
+      res.json(data);
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  // Create payment (server-side, stores deposit record)
+  app.post("/api/sendavapay/create", requireAuth, async (req, res) => {
+    try {
+      const { amount, country, operatorId, operatorName } = req.body;
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) return res.status(401).json({ message: "Non authentifié" });
+
+      const settings = await storage.getSettings();
+      if (settings.sendavapayEnabled !== "true") {
+        return res.status(400).json({ message: "SendavaPay non activé" });
+      }
+      const minDeposit = parseInt(settings.minDeposit || "3000");
+      if (!amount || amount < minDeposit) {
+        return res.status(400).json({ message: `Montant minimum: ${minDeposit.toLocaleString()} FCFA` });
+      }
+
+      const svCountry = toSendavapayCountry(country);
+      const currency = sendavapayGetCurrency(country);
+      const externalRef = `DEP-${Date.now()}-${user.id}`;
+      const customerPhone = sendavapayFormatPhone(user.phone, country);
+      const devDomain = process.env.REPLIT_DEV_DOMAIN;
+      const baseUrl = devDomain ? `https://${devDomain}` : "https://doosan.replit.app";
+      const webhookUrl = `${baseUrl}/api/webhooks/sendavapay`;
+
+      const result = await sendavapayCreate({
+        amount,
+        currency,
+        description: `Dépôt #${externalRef}`,
+        customerName: user.fullName,
+        customerPhone,
+        customerEmail: `user${user.id}@doosan.app`,
+        payerCountry: svCountry,
+        webhookUrl,
+        externalReference: externalRef,
+      });
+
+      if (!result.success || !result.data) {
+        return res.status(400).json({
+          message: result.error || "Erreur SendavaPay",
+        });
+      }
+
+      const deposit = await storage.createDeposit({
+        userId: user.id,
+        amount,
+        accountName: user.fullName,
+        accountNumber: customerPhone,
+        country,
+        paymentMethod: operatorName || "SendavaPay",
+        status: "processing",
+        sendavapayReference: result.data.reference,
+        sendavapayToken: result.data.paymentToken,
+      });
+
+      res.json({
+        depositId: deposit.id,
+        paymentToken: result.data.paymentToken,
+        reference: result.data.reference,
+        expiresAt: result.data.expiresAt,
+      });
+    } catch (error: any) {
+      console.error("[sendavapay] create error:", error);
+      res.status(500).json({ message: error.message || "Erreur serveur" });
+    }
+  });
+
+  // Initiate payment (proxy, calls CORS endpoint on behalf of authenticated user)
+  app.post("/api/sendavapay/initiate", requireAuth, async (req, res) => {
+    try {
+      const { paymentToken, payerCountry, operatorId, depositId } = req.body;
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) return res.status(401).json({ message: "Non authentifié" });
+
+      const svCountry = toSendavapayCountry(payerCountry);
+      const customerPhone = sendavapayFormatPhone(user.phone, payerCountry);
+
+      const result = await sendavapayInitiate({
+        paymentToken,
+        payerName: user.fullName,
+        payerPhone: customerPhone,
+        payerCountry: svCountry,
+        operatorId,
+      });
+
+      // Update deposit status to processing
+      if (depositId) {
+        await storage.updateDeposit(depositId, { status: "processing" });
+      }
+
+      res.json(result);
+    } catch (error: any) {
+      console.error("[sendavapay] initiate error:", error);
+      res.status(500).json({ message: error.message || "Erreur serveur" });
+    }
+  });
+
+  // Submit OTP (proxy)
+  app.post("/api/sendavapay/submit-otp", requireAuth, async (req, res) => {
+    try {
+      const { otpToken, otp } = req.body;
+      if (!otpToken || !otp) {
+        return res.status(400).json({ message: "otpToken et otp requis" });
+      }
+      const result = await sendavapaySubmitOtp({ otpToken, otp });
+      res.json(result);
+    } catch (error: any) {
+      console.error("[sendavapay] submit-otp error:", error);
+      res.status(500).json({ message: error.message || "Erreur serveur" });
+    }
+  });
+
+  // Poll payment status
+  app.get("/api/deposits/:id/sendavapay-status", requireAuth, async (req, res) => {
+    try {
+      const depositId = parseInt(req.params.id);
+      const deposit = await storage.getDeposit(depositId);
+      if (!deposit) return res.status(404).json({ message: "Dépôt non trouvé" });
+      if (deposit.userId !== req.session.userId) return res.status(403).json({ message: "Accès refusé" });
+
+      if (deposit.status === "approved" || deposit.status === "rejected") {
+        return res.json({ status: deposit.status });
+      }
+
+      if (!deposit.sendavapayReference) {
+        return res.json({ status: deposit.status });
+      }
+
+      const verifyResult = await sendavapayVerify(deposit.sendavapayReference);
+      if (!verifyResult.success || !verifyResult.data) {
+        return res.json({ status: deposit.status });
+      }
+
+      const newStatus = mapSendavapayStatus(verifyResult.data.status);
+      if (newStatus !== "pending" && newStatus !== deposit.status) {
+        await storage.updateDeposit(depositId, { status: newStatus, processedAt: new Date() });
+
+        if (newStatus === "approved") {
+          const user = await storage.getUser(deposit.userId);
+          if (user) {
+            const newBalance = parseFloat(user.balance) + deposit.amount;
+            await storage.updateUser(deposit.userId, {
+              balance: newBalance.toFixed(2),
+              hasDeposited: true,
+            });
+            await storage.createTransaction({
+              userId: deposit.userId,
+              type: "deposit",
+              amount: deposit.amount.toString(),
+              description: `Dépôt SendavaPay #${deposit.id}`,
+            });
+            await storage.processDepositReferralCommissions(deposit.userId, deposit.amount);
+          }
+        }
+      }
+
+      res.json({ status: newStatus || deposit.status, rawStatus: verifyResult.data.status });
+    } catch (error: any) {
+      console.error("[sendavapay] status check error:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Webhook (HMAC verified)
+  app.post(
+    "/api/webhooks/sendavapay",
+    express.raw({ type: "application/json" }),
+    async (req, res) => {
+      try {
+        const settings = await storage.getSettings();
+        const secret = settings.sendavapayWebhookSecret || "";
+        const sig = req.headers["x-sendavapay-signature"] as string || "";
+
+        if (secret && !sendavapayVerifySignature(req.body as Buffer, sig, secret)) {
+          console.warn("[sendavapay webhook] Invalid signature");
+          return res.status(401).json({ message: "Invalid signature" });
+        }
+
+        const payload = JSON.parse((req.body as Buffer).toString());
+        const { event, reference, status } = payload;
+
+        if (!reference) return res.json({ received: true });
+
+        // Find deposit by sendavapay reference
+        const deposit = await storage.getDepositBySendavapayReference(reference);
+        if (!deposit) {
+          console.warn(`[sendavapay webhook] No deposit found for reference ${reference}`);
+          return res.json({ received: true });
+        }
+
+        if (deposit.status === "approved" || deposit.status === "rejected") {
+          return res.json({ received: true }); // already processed
+        }
+
+        if (event === "payment.completed" || status === "completed") {
+          await storage.updateDeposit(deposit.id, { status: "approved", processedAt: new Date() });
+          const user = await storage.getUser(deposit.userId);
+          if (user) {
+            const newBalance = parseFloat(user.balance) + deposit.amount;
+            await storage.updateUser(deposit.userId, {
+              balance: newBalance.toFixed(2),
+              hasDeposited: true,
+            });
+            await storage.createTransaction({
+              userId: deposit.userId,
+              type: "deposit",
+              amount: deposit.amount.toString(),
+              description: `Dépôt SendavaPay #${deposit.id}`,
+            });
+            await storage.processDepositReferralCommissions(deposit.userId, deposit.amount);
+          }
+        } else if (event === "payment.failed" || event === "payment.expired" || status === "failed" || status === "cancelled") {
+          await storage.updateDeposit(deposit.id, { status: "rejected", processedAt: new Date() });
+        }
+
+        res.json({ received: true });
+      } catch (error: any) {
+        console.error("[sendavapay webhook] error:", error);
+        res.status(500).json({ message: error.message });
+      }
+    }
+  );
 
   // Withdrawals
   app.post("/api/withdrawals", requireAuth, async (req, res) => {

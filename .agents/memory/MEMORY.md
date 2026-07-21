@@ -1,1 +1,2 @@
 - [Doosan Platform Setup](vestas-platform.md) — Platform rebranded Intel→Vestas→Doosan (robotics). Key colors, assets, and DB quirks documented.
+- [SendavaPay integration](sendavapay-integration.md) — Payin deposit flow: backend creates+initiates, user phone auto-used, OTP/redirect handled, webhook HMAC verified.

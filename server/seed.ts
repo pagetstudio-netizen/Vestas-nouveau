@@ -211,6 +211,9 @@ export async function seed() {
     { key: "omnipayEnabled", value: "false" },
     { key: "omnipayChannelName", value: "OmniPay" },
     { key: "omnipayCallbackKey", value: "" },
+    { key: "sendavapayEnabled", value: "false" },
+    { key: "sendavapayChannelName", value: "SendavaPay" },
+    { key: "sendavapayWebhookSecret", value: "" },
   ];
 
   for (const settingData of requiredSettings) {

@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Loader2, Save, Link, Clock, Users } from "lucide-react";
+import { Loader2, Save, Link, Clock, Users, Zap } from "lucide-react";
 
 const NETWORKS = [
   { value: "telegram", label: "Telegram" },
@@ -51,6 +51,9 @@ const settingsSchema = z.object({
   level1Commission: z.string().min(1, "Commission requise"),
   level2Commission: z.string().min(1, "Commission requise"),
   level3Commission: z.string().min(1, "Commission requise"),
+  sendavapayEnabled: z.boolean(),
+  sendavapayChannelName: z.string().min(1, "Nom requis"),
+  sendavapayWebhookSecret: z.string(),
 });
 
 type SettingsForm = z.infer<typeof settingsSchema>;
@@ -129,6 +132,9 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
         level1Commission: settings.level1Commission || "15",
         level2Commission: settings.level2Commission || "2",
         level3Commission: settings.level3Commission || "1",
+        sendavapayEnabled: settings.sendavapayEnabled === "true",
+        sendavapayChannelName: settings.sendavapayChannelName || "SendavaPay",
+        sendavapayWebhookSecret: settings.sendavapayWebhookSecret || "",
       });
     }
   }, [settings, form]);
@@ -141,6 +147,7 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
         support2Enabled: String(data.support2Enabled),
         channelEnabled: String(data.channelEnabled),
         groupEnabled: String(data.groupEnabled),
+        sendavapayEnabled: String(data.sendavapayEnabled),
       };
       const response = await apiRequest("POST", "/api/admin/settings", serialized);
       if (!response.ok) {
@@ -489,6 +496,52 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
                   <FormMessage />
                 </FormItem>
               )} />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ── SendavaPay ── */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Zap className="w-5 h-5 text-blue-500" />
+              SendavaPay — Paiement automatique
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between rounded-xl border p-3">
+              <div>
+                <p className="text-sm font-semibold text-gray-800">Activer SendavaPay</p>
+                <p className="text-xs text-gray-500">Affiche l'option de paiement automatique Mobile Money</p>
+              </div>
+              <FormField control={form.control} name="sendavapayEnabled" render={({ field }) => (
+                <FormItem className="flex items-center gap-2 space-y-0">
+                  <FormLabel className="text-xs text-gray-500">{field.value ? "Actif" : "Désactivé"}</FormLabel>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )} />
+            </div>
+            <FormField control={form.control} name="sendavapayChannelName" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nom du canal affiché</FormLabel>
+                <FormControl><Input {...field} placeholder="SendavaPay" /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+            <FormField control={form.control} name="sendavapayWebhookSecret" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Webhook Secret</FormLabel>
+                <FormControl><Input {...field} type="password" placeholder="whsec_..." /></FormControl>
+                <FormDescription className="text-xs">Secret retourné par SendavaPay lors de la configuration du webhook. Laissez vide pour désactiver la vérification de signature.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )} />
+            <div className="rounded-xl bg-blue-50 border border-blue-100 p-3 text-xs text-blue-700 space-y-1">
+              <p className="font-semibold">Configuration requise :</p>
+              <p>1. Ajoutez la variable d'environnement <code className="bg-blue-100 px-1 rounded">SENDAVAPAY_API_KEY</code> avec votre clé SDK (commence par <code className="bg-blue-100 px-1 rounded">sdk_</code>)</p>
+              <p>2. Configurez l'URL webhook dans votre compte SendavaPay : <code className="bg-blue-100 px-1 rounded">/api/webhooks/sendavapay</code></p>
             </div>
           </CardContent>
         </Card>
