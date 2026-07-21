@@ -10,6 +10,8 @@ import type { Product } from "@shared/schema";
 
 import vestasLogo from "@assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Corporation_-_Logo.s_1784561452870.png";
 import serviceIcon from "@assets/20260311_214852_1773265973964.png";
+import btnOurProducts from "@assets/20260721_173328_1784656524037.png";
+import btnMyProduct from "@assets/20260721_173249_1784656523987.png";
 
 import productImg1 from "@assets/téléchargement_(16)_1784561452683.jpeg";
 import productImg2 from "@assets/téléchargement_(20)_1784561452229.jpeg";
@@ -33,7 +35,6 @@ export default function MyProductsPage() {
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<"our" | "my">("our");
-  const [mySubTab, setMySubTab] = useState<"fixes" | "bientot" | "commandes">("commandes");
   const [confirmProduct, setConfirmProduct] = useState<ProductWithOwnership | null>(null);
 
   const { data: products, isLoading: loadingProducts } = useQuery<ProductWithOwnership[]>({
@@ -124,26 +125,30 @@ export default function MyProductsPage() {
       {/* Tab toggle buttons */}
       <div className="flex gap-3 px-4 pt-4 pb-2 shrink-0">
         <button
-          className="flex-1 py-3 rounded-xl font-bold text-sm transition-all"
-          style={{
-            background: activeTab === "our" ? "linear-gradient(135deg, #22c55e, #16a34a)" : "#e5e7eb",
-            color: activeTab === "our" ? "#fff" : "#6b7280",
-          }}
+          className="flex-1"
+          style={{ height: 52 }}
           onClick={() => setActiveTab("our")}
           data-testid="tab-our-products"
         >
-          our products
+          <img
+            src={btnOurProducts}
+            alt="our products"
+            className="w-full h-full object-contain"
+            style={{ opacity: activeTab === "our" ? 1 : 0.45 }}
+          />
         </button>
         <button
-          className="flex-1 py-3 rounded-xl font-bold text-sm transition-all"
-          style={{
-            background: activeTab === "my" ? "linear-gradient(135deg, #22c55e, #16a34a)" : "#e5e7eb",
-            color: activeTab === "my" ? "#fff" : "#6b7280",
-          }}
+          className="flex-1"
+          style={{ height: 52 }}
           onClick={() => setActiveTab("my")}
           data-testid="tab-my-product"
         >
-          my product
+          <img
+            src={btnMyProduct}
+            alt="my product"
+            className="w-full h-full object-contain"
+            style={{ opacity: activeTab === "my" ? 1 : 0.45 }}
+          />
         </button>
       </div>
 
@@ -233,27 +238,6 @@ export default function MyProductsPage() {
         {/* ── MY PRODUCT tab ── */}
         {activeTab === "my" && (
           <div className="mt-1">
-            {/* Three sub-tabs */}
-            <div className="flex gap-1 mb-3 bg-white rounded-xl p-1 shadow-sm">
-              {(["fixes", "bientot", "commandes"] as const).map((tab) => {
-                const labels = { fixes: "Commandes fixes", bientot: "Commandes bientôt", commandes: "Commandes" };
-                const isActive = mySubTab === tab;
-                return (
-                  <button
-                    key={tab}
-                    onClick={() => setMySubTab(tab)}
-                    className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
-                    style={{
-                      background: isActive ? "linear-gradient(135deg, #22c55e, #16a34a)" : "transparent",
-                      color: isActive ? "#fff" : "#6b7280",
-                    }}
-                  >
-                    {labels[tab]}
-                  </button>
-                );
-              })}
-            </div>
-
             {/* Product list */}
             <div className="space-y-3">
               {loadingUserProducts ? (
