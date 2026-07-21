@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { FALLBACK_COUNTRIES, type ApiCountry } from "@/lib/countries";
 import { CountrySelector } from "@/components/country-selector";
 import { Loader2 } from "lucide-react";
-import robotImg from "@assets/doosan-dx-w-tractor-zandstra-société-à-amsterdam-les-pays-bas-_1784561452833.jpg";
+import robotImg from "@assets/ai-robot-typing-on-ipad-isolated-on-transparent-background-fre_1784669526213.png";
 
 const registerSchema = z.object({
   phone: z.string().min(8, "Numéro de téléphone invalide"),
@@ -207,17 +207,27 @@ export default function RegisterPage() {
       </div>
 
       {/* Robot image at bottom */}
-      <div className="w-full mt-4 relative" style={{ height: 220 }}>
-        {/* fade overlay on top */}
+      <div className="w-full mt-4 relative" style={{ height: 260, background: "#000" }}>
+        {/* fade overlay top */}
         <div
           className="absolute top-0 left-0 right-0 z-10"
-          style={{ height: 80, background: "linear-gradient(to bottom, #000000, transparent)" }}
+          style={{ height: 100, background: "linear-gradient(to bottom, #000000 0%, transparent 100%)" }}
+        />
+        {/* fade overlay bottom */}
+        <div
+          className="absolute bottom-0 left-0 right-0 z-10"
+          style={{ height: 100, background: "linear-gradient(to top, #000000 0%, transparent 100%)" }}
+        />
+        {/* dark tint overlay */}
+        <div
+          className="absolute inset-0 z-10"
+          style={{ background: "rgba(0,0,0,0.35)" }}
         />
         <img
           src={robotImg}
           alt="Doosan Robotics"
-          className="w-full h-full object-cover"
-          style={{ objectPosition: "center top" }}
+          className="w-full h-full object-contain"
+          style={{ objectPosition: "center bottom" }}
         />
       </div>
 
