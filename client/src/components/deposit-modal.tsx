@@ -17,8 +17,6 @@ import type { PaymentChannel } from "@shared/schema";
 
 const depositSchema = z.object({
   amount: z.string().min(1, "Montant requis"),
-  accountName: z.string().min(2, "Nom du compte requis"),
-  accountNumber: z.string().min(8, "Numéro de paiement requis"),
   paymentMethod: z.string().min(2, "Moyen de paiement requis"),
   paymentChannelId: z.string().min(1, "Canal de recharge requis"),
 });
@@ -45,8 +43,6 @@ export default function DepositModal({ open, onClose }: DepositModalProps) {
     resolver: zodResolver(depositSchema),
     defaultValues: {
       amount: "",
-      accountName: "",
-      accountNumber: "",
       paymentMethod: "",
       paymentChannelId: "",
     },
@@ -56,8 +52,8 @@ export default function DepositModal({ open, onClose }: DepositModalProps) {
     mutationFn: async (data: DepositForm) => {
       const response = await apiRequest("POST", "/api/deposits", {
         amount: parseInt(data.amount),
-        accountName: data.accountName,
-        accountNumber: data.accountNumber,
+        accountName: user!.fullName,
+        accountNumber: user!.phone,
         country: user!.country,
         paymentMethod: data.paymentMethod,
         paymentChannelId: parseInt(data.paymentChannelId),

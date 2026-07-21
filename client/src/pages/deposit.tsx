@@ -619,15 +619,6 @@ export default function DepositPage() {
           )}
         </div>
 
-        {/* Note: phone used automatically */}
-        {svOperator && (
-          <div className="rounded-xl bg-blue-50 border border-blue-100 p-3">
-            <p className="text-xs text-blue-700">
-              Le paiement sera initié sur votre numéro enregistré : <strong>{user?.phone}</strong>
-            </p>
-          </div>
-        )}
-
         <button
           onClick={() => svInitiateMutation.mutate()}
           disabled={!svOperator || svInitiateMutation.isPending}
