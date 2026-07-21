@@ -83,47 +83,33 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative flex flex-col" style={{ background: "#000000" }}>
+    <div className="h-screen overflow-hidden relative flex flex-col px-6" style={{ background: "#000000" }}>
 
-      {/* Robot image — behind content, bottom-anchored, overlaps form */}
-      <div className="absolute bottom-0 left-0 right-0 z-0" style={{ height: "65vh" }}>
-        {/* top fade — gentle, lets robot head peek into form area */}
-        <div
-          className="absolute top-0 left-0 right-0 z-10"
-          style={{ height: "28%", background: "linear-gradient(to bottom, #000000 0%, transparent 100%)" }}
-        />
-        {/* bottom fade */}
-        <div
-          className="absolute bottom-0 left-0 right-0 z-10"
-          style={{ height: "15%", background: "linear-gradient(to top, #000000 0%, transparent 100%)" }}
-        />
-        {/* dark tint */}
-        <div className="absolute inset-0 z-10" style={{ background: "rgba(0,0,0,0.20)" }} />
+      {/* Robot — absolute, bottom-anchored, overlaps button area */}
+      <div className="absolute bottom-0 left-0 right-0 z-0" style={{ height: "46vh" }}>
+        <div className="absolute top-0 left-0 right-0 z-10"
+          style={{ height: "32%", background: "linear-gradient(to bottom, #000000 0%, transparent 100%)" }} />
+        <div className="absolute bottom-0 left-0 right-0 z-10"
+          style={{ height: "10%", background: "linear-gradient(to top, #000000 0%, transparent 100%)" }} />
+        <div className="absolute inset-0 z-10" style={{ background: "rgba(0,0,0,0.18)" }} />
+        <img src={robotImg} alt="Doosan Robotics" className="w-full h-full object-contain object-bottom" />
+      </div>
+
+      {/* Logo — upper zone, flex-1 centres it vertically in the available space */}
+      <div className="flex-1 flex items-center justify-center relative z-10" style={{ paddingTop: "5vh" }}>
         <img
-          src={robotImg}
-          alt="Doosan Robotics"
-          className="w-full h-full object-contain object-bottom"
+          src={intelLogo}
+          alt="Doosan"
+          className="h-16 w-auto object-contain"
+          style={{ filter: "brightness(0) invert(1)" }}
         />
       </div>
 
-      {/* Scrollable content — sits above image */}
-      <div className="relative z-10 flex flex-col px-6 pt-12" style={{ paddingBottom: "38vh" }}>
-
-        {/* Logo */}
-        <div className="flex justify-center mb-10">
-          <img
-            src={intelLogo}
-            alt="Doosan"
-            className="h-16 w-auto object-contain"
-            style={{ filter: "brightness(0) invert(1)" }}
-          />
-        </div>
-
-        {/* Form */}
+      {/* Form — bottom zone, padding pushes it above the robot */}
+      <div className="flex-none relative z-10 flex flex-col gap-3" style={{ paddingBottom: "29vh" }}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3">
           <input type="hidden" {...form.register("country")} />
 
-          {/* Sélectionner pays + téléphone */}
           <button
             type="button"
             onClick={() => setCountryModalOpen(true)}
@@ -148,7 +134,6 @@ export default function LoginPage() {
             <p className="text-red-400 text-xs -mt-1 ml-1">{form.formState.errors.phone.message}</p>
           )}
 
-          {/* Mot de passe */}
           <div
             className="w-full h-14 rounded-xl flex items-center px-4"
             style={{ background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.12)" }}
@@ -165,7 +150,6 @@ export default function LoginPage() {
             <p className="text-red-400 text-xs -mt-1 ml-1">{form.formState.errors.password.message}</p>
           )}
 
-          {/* Se souvenir */}
           <div className="flex items-center gap-2 mt-1">
             <input
               type="checkbox"
@@ -180,11 +164,10 @@ export default function LoginPage() {
             </label>
           </div>
 
-          {/* Bouton connexion */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-14 rounded-full text-white font-bold text-base disabled:opacity-50 mt-3"
+            className="w-full h-14 rounded-full text-white font-bold text-base disabled:opacity-50 mt-2"
             style={{ background: "linear-gradient(135deg, #5b21b6, #4f46e5)" }}
             data-testid="button-login"
           >
@@ -196,8 +179,7 @@ export default function LoginPage() {
             ) : "Se connecter"}
           </button>
 
-          {/* Lien inscription */}
-          <div className="text-right mt-2">
+          <div className="text-right mt-1">
             <button
               type="button"
               onClick={() => navigate("/register")}

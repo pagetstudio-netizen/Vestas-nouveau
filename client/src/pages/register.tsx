@@ -91,40 +91,31 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen relative flex flex-col" style={{ background: "#000000" }}>
+    <div className="h-screen overflow-hidden relative flex flex-col px-6" style={{ background: "#000000" }}>
 
-      {/* Robot image — behind content, bottom-anchored, overlaps form */}
-      <div className="absolute bottom-0 left-0 right-0 z-0" style={{ height: "65vh" }}>
-        {/* top fade — gentle, lets robot head peek into form area */}
-        <div
-          className="absolute top-0 left-0 right-0 z-10"
-          style={{ height: "28%", background: "linear-gradient(to bottom, #000000 0%, transparent 100%)" }}
-        />
-        {/* bottom fade */}
-        <div
-          className="absolute bottom-0 left-0 right-0 z-10"
-          style={{ height: "15%", background: "linear-gradient(to top, #000000 0%, transparent 100%)" }}
-        />
-        {/* dark tint */}
-        <div className="absolute inset-0 z-10" style={{ background: "rgba(0,0,0,0.20)" }} />
-        <img
-          src={robotImg}
-          alt="Doosan Robotics"
-          className="w-full h-full object-contain object-bottom"
-        />
+      {/* Robot — absolute, bottom-anchored */}
+      <div className="absolute bottom-0 left-0 right-0 z-0" style={{ height: "36vh" }}>
+        <div className="absolute top-0 left-0 right-0 z-10"
+          style={{ height: "35%", background: "linear-gradient(to bottom, #000000 0%, transparent 100%)" }} />
+        <div className="absolute bottom-0 left-0 right-0 z-10"
+          style={{ height: "10%", background: "linear-gradient(to top, #000000 0%, transparent 100%)" }} />
+        <div className="absolute inset-0 z-10" style={{ background: "rgba(0,0,0,0.18)" }} />
+        <img src={robotImg} alt="Doosan Robotics" className="w-full h-full object-contain object-bottom" />
       </div>
 
-      {/* Scrollable content — sits above image */}
-      <div className="relative z-10 flex flex-col px-6 pt-12" style={{ paddingBottom: "38vh" }}>
+      {/* Title — top */}
+      <div className="flex-none relative z-10" style={{ paddingTop: "10vh", paddingBottom: "3vh" }}>
+        <h1 className="text-white text-3xl font-bold">Inscription</h1>
+      </div>
 
-        {/* Title */}
-        <h1 className="text-white text-3xl font-bold mb-8">Inscription</h1>
+      {/* Spacer — pushes form toward bottom */}
+      <div className="flex-1" />
 
-        {/* Form */}
+      {/* Form — bottom zone, above robot */}
+      <div className="flex-none relative z-10 flex flex-col gap-3" style={{ paddingBottom: "20vh" }}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3">
           <input type="hidden" {...form.register("country")} />
 
-          {/* Pays + téléphone */}
           <button
             type="button"
             onClick={() => setCountryModalOpen(true)}
@@ -149,7 +140,6 @@ export default function RegisterPage() {
             <p className="text-red-400 text-xs -mt-1 ml-1">{form.formState.errors.phone.message}</p>
           )}
 
-          {/* Mot de passe */}
           <div
             className="w-full h-14 rounded-xl flex items-center px-4"
             style={{ background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.12)" }}
@@ -166,7 +156,6 @@ export default function RegisterPage() {
             <p className="text-red-400 text-xs -mt-1 ml-1">{form.formState.errors.password.message}</p>
           )}
 
-          {/* Confirmer mot de passe */}
           <div
             className="w-full h-14 rounded-xl flex items-center px-4"
             style={{ background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.12)" }}
@@ -183,7 +172,6 @@ export default function RegisterPage() {
             <p className="text-red-400 text-xs -mt-1 ml-1">{form.formState.errors.confirmPassword.message}</p>
           )}
 
-          {/* Code d'invitation */}
           <div
             className="w-full h-14 rounded-xl flex items-center px-4"
             style={{ background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.12)" }}
@@ -196,11 +184,10 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Bouton inscription */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-14 rounded-full text-white font-bold text-base disabled:opacity-50 mt-3"
+            className="w-full h-14 rounded-full text-white font-bold text-base disabled:opacity-50 mt-2"
             style={{ background: "linear-gradient(135deg, #5b21b6, #4f46e5)" }}
             data-testid="button-register"
           >
@@ -212,8 +199,7 @@ export default function RegisterPage() {
             ) : "S'inscrire"}
           </button>
 
-          {/* Lien connexion */}
-          <div className="text-right mt-2">
+          <div className="text-right mt-1">
             <button
               type="button"
               onClick={() => navigate("/login")}
