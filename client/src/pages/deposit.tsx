@@ -272,7 +272,23 @@ export default function DepositPage() {
       });
       return;
     }
-    setStep("select");
+    // Go directly to SendavaPay if enabled, otherwise show selection
+    if (sendavapayEnabled) {
+      setSvCountry(country);
+      setStep("sv-operator");
+    } else {
+      setStep("select");
+    }
+  };
+
+  const getOperatorIcon = (name: string): string | null => {
+    const n = name.toLowerCase();
+    if (n.includes("tmoney") || n.includes("t-money")) return "/operators/tmoney.png";
+    if (n.includes("moov")) return "/operators/moov.jpg";
+    if (n.includes("orange")) return "/operators/orange.png";
+    if (n.includes("mtn")) return "/operators/mtn.png";
+    if (n.includes("airtel")) return "/operators/airtel.png";
+    return null;
   };
 
   const handleSubmit = () => {
@@ -545,7 +561,7 @@ export default function DepositPage() {
   if (step === "sv-operator") return (
     <div className="min-h-screen bg-white">
       <header className="flex items-center justify-between px-4 py-4 bg-white border-b border-gray-100">
-        <button className="flex items-center gap-1 text-gray-800" onClick={() => setStep("select")}>
+        <button className="flex items-center gap-1 text-gray-800" onClick={() => setStep("amount")}>
           <ChevronLeft className="w-5 h-5" />
           <span className="font-semibold text-base">{sendavapayChannelName}</span>
         </button>
@@ -591,30 +607,37 @@ export default function DepositPage() {
             </div>
           ) : (
             <div className="space-y-2">
-              {svOperators.map((op) => (
-                <button
-                  key={op.id}
-                  onClick={() => setSvOperator(op)}
-                  className={`w-full flex items-center justify-between px-4 py-4 rounded-xl border-2 transition-all ${
-                    svOperator?.id === op.id
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 bg-white hover:border-blue-200"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
-                      svOperator?.id === op.id ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-600"
-                    }`}>
-                      {op.name.charAt(0)}
+              {svOperators.map((op) => {
+                const icon = getOperatorIcon(op.name);
+                return (
+                  <button
+                    key={op.id}
+                    onClick={() => setSvOperator(op)}
+                    className={`w-full flex items-center justify-between px-4 py-4 rounded-xl border-2 transition-all ${
+                      svOperator?.id === op.id
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 bg-white hover:border-blue-200"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {icon ? (
+                        <img src={icon} alt={op.name} className="w-10 h-10 rounded-full object-cover border border-gray-100" />
+                      ) : (
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+                          svOperator?.id === op.id ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-600"
+                        }`}>
+                          {op.name.charAt(0)}
+                        </div>
+                      )}
+                      <div className="text-left">
+                        <p className="font-semibold text-gray-900 text-sm">{op.name}</p>
+                        {op.requiresOtp && <p className="text-xs text-orange-500">Code OTP requis</p>}
+                      </div>
                     </div>
-                    <div className="text-left">
-                      <p className="font-semibold text-gray-900 text-sm">{op.name}</p>
-                      {op.requiresOtp && <p className="text-xs text-orange-500">Code OTP requis</p>}
-                    </div>
-                  </div>
-                  {svOperator?.id === op.id && <CheckCircle className="w-5 h-5 text-blue-500" />}
-                </button>
-              ))}
+                    {svOperator?.id === op.id && <CheckCircle className="w-5 h-5 text-blue-500" />}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
