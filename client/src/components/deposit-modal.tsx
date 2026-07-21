@@ -185,34 +185,6 @@ export default function DepositModal({ open, onClose }: DepositModalProps) {
 
               <FormField
                 control={form.control}
-                name="accountName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nom du compte de paiement</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Votre nom complet" data-testid="input-account-name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="accountNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Numéro de paiement</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="tel" placeholder="Votre numéro" data-testid="input-account-number" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="paymentMethod"
                 render={({ field }) => (
                   <FormItem>
