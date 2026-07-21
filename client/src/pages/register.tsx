@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { FALLBACK_COUNTRIES, type ApiCountry } from "@/lib/countries";
 import { CountrySelector } from "@/components/country-selector";
 import { Loader2 } from "lucide-react";
-import intelLogo from "@assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Corporation_-_Logo.s_1784561452870.png";
+import robotImg from "@assets/doosan-dx-w-tractor-zandstra-société-à-amsterdam-les-pays-bas-_1784561452833.jpg";
 
 const registerSchema = z.object({
   phone: z.string().min(8, "Numéro de téléphone invalide"),
@@ -91,57 +91,53 @@ export default function RegisterPage() {
   }
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ background: "#0d1b2e" }}
-    >
-      <div className="flex-1 flex flex-col px-6 pt-14 pb-10 overflow-y-auto">
+    <div className="min-h-screen flex flex-col" style={{ background: "#000000" }}>
 
-        {/* Logo */}
-        <div className="flex justify-center mb-10">
-          <img src={intelLogo} alt="Doosan" className="w-28 h-28 object-contain" />
-        </div>
+      {/* Scrollable content */}
+      <div className="flex-1 flex flex-col px-6 pt-12 pb-0">
 
-        {/* Fields */}
+        {/* Title */}
+        <h1 className="text-white text-3xl font-bold mb-8">Inscription</h1>
+
+        {/* Form */}
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3">
           <input type="hidden" {...form.register("country")} />
 
-          {/* Sélectionner pays */}
+          {/* Pays + téléphone */}
           <button
             type="button"
             onClick={() => setCountryModalOpen(true)}
-            className="w-full h-14 bg-white rounded-lg flex items-center px-4 text-left"
+            className="w-full h-14 rounded-xl flex items-center px-4 text-left"
+            style={{ background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.12)" }}
             data-testid="button-select-country"
           >
-            <span className="text-gray-500 text-base flex-1">
-              {countryData ? `${countryData.name} (+${countryData.phonePrefix})` : "Sélectionnez votre pays >>"}
+            <span className="text-white/60 text-base">
+              {countryData ? `+${countryData.phonePrefix}` : "+--"}
             </span>
-          </button>
-          {form.formState.errors.country && (
-            <p className="text-red-400 text-xs -mt-1 ml-1">{form.formState.errors.country.message}</p>
-          )}
-
-          {/* Numéro de téléphone */}
-          <div className="w-full h-14 bg-white rounded-lg flex items-center px-4">
+            <span className="mx-2 text-white/30">›</span>
             <input
               {...form.register("phone")}
               type="tel"
-              placeholder="Saisissez votre numéro de mobile"
-              className="flex-1 bg-transparent text-gray-800 placeholder:text-gray-400 text-base outline-none"
+              placeholder="Entrez votre identifiant"
+              className="flex-1 bg-transparent text-white placeholder:text-white/40 text-base outline-none"
               data-testid="input-phone"
+              onClick={e => e.stopPropagation()}
             />
-          </div>
+          </button>
           {form.formState.errors.phone && (
             <p className="text-red-400 text-xs -mt-1 ml-1">{form.formState.errors.phone.message}</p>
           )}
 
           {/* Mot de passe */}
-          <div className="w-full h-14 bg-white rounded-lg flex items-center px-4">
+          <div
+            className="w-full h-14 rounded-xl flex items-center px-4"
+            style={{ background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.12)" }}
+          >
             <input
               {...form.register("password")}
               type="password"
-              placeholder="Mot de passe de connexion"
-              className="flex-1 bg-transparent text-gray-800 placeholder:text-gray-400 text-base outline-none"
+              placeholder="Mot de passe"
+              className="flex-1 bg-transparent text-white placeholder:text-white/40 text-base outline-none"
               data-testid="input-password"
             />
           </div>
@@ -150,12 +146,15 @@ export default function RegisterPage() {
           )}
 
           {/* Confirmer mot de passe */}
-          <div className="w-full h-14 bg-white rounded-lg flex items-center px-4">
+          <div
+            className="w-full h-14 rounded-xl flex items-center px-4"
+            style={{ background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.12)" }}
+          >
             <input
               {...form.register("confirmPassword")}
               type="password"
-              placeholder="Répéter le mot de passe"
-              className="flex-1 bg-transparent text-gray-800 placeholder:text-gray-400 text-base outline-none"
+              placeholder="Confirmez le mot de passe"
+              className="flex-1 bg-transparent text-white placeholder:text-white/40 text-base outline-none"
               data-testid="input-confirm-password"
             />
           </div>
@@ -164,11 +163,14 @@ export default function RegisterPage() {
           )}
 
           {/* Code d'invitation */}
-          <div className="w-full h-14 bg-white rounded-lg flex items-center px-4">
+          <div
+            className="w-full h-14 rounded-xl flex items-center px-4"
+            style={{ background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.12)" }}
+          >
             <input
               {...form.register("invitationCode")}
               placeholder="Code d'invitation"
-              className="flex-1 bg-transparent text-gray-800 placeholder:text-gray-400 text-base outline-none"
+              className="flex-1 bg-transparent text-white placeholder:text-white/40 text-base outline-none"
               data-testid="input-invitation-code"
             />
           </div>
@@ -177,8 +179,8 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-14 rounded-full text-white font-bold text-base disabled:opacity-50 mt-4"
-            style={{ background: "#0a1628", border: "2px solid #2a4a7f" }}
+            className="w-full h-14 rounded-full text-white font-bold text-base disabled:opacity-50 mt-3"
+            style={{ background: "linear-gradient(135deg, #5b21b6, #4f46e5)" }}
             data-testid="button-register"
           >
             {isLoading ? (
@@ -186,22 +188,37 @@ export default function RegisterPage() {
                 <Loader2 className="w-5 h-5 animate-spin" />
                 Inscription...
               </span>
-            ) : "Créez un compte dès maintenant"}
+            ) : "S'inscrire"}
           </button>
 
           {/* Lien connexion */}
-          <div className="text-center mt-4 pb-4">
-            <span className="text-white/70 text-sm">J'ai déjà créé un compte,  </span>
+          <div className="text-right mt-2">
             <button
               type="button"
               onClick={() => navigate("/login")}
-              className="text-white font-bold text-sm underline"
+              className="text-sm font-semibold"
+              style={{ color: "#818cf8" }}
               data-testid="link-login"
             >
-              Je vais me connecter maintenant.
+              Aller à la connexion &gt;
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Robot image at bottom */}
+      <div className="w-full mt-4 relative" style={{ height: 220 }}>
+        {/* fade overlay on top */}
+        <div
+          className="absolute top-0 left-0 right-0 z-10"
+          style={{ height: 80, background: "linear-gradient(to bottom, #000000, transparent)" }}
+        />
+        <img
+          src={robotImg}
+          alt="Doosan Robotics"
+          className="w-full h-full object-cover"
+          style={{ objectPosition: "center top" }}
+        />
       </div>
 
       <CountrySelector
