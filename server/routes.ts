@@ -116,7 +116,7 @@ export async function registerRoutes(
       store: new PgSession({
         conString: process.env.DATABASE_URL,
         tableName: "session",
-        createTableIfMissing: false,
+        createTableIfMissing: true,
         pruneSessionInterval: 60 * 60,
       }),
       secret: process.env.SESSION_SECRET || "fb2e4a19c3d87b650a12e4f98c23d17a84b6e9c5f2301a8d7bc4e506a90f3812",
