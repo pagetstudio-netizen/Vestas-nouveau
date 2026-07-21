@@ -87,6 +87,31 @@ Preferred communication style: Simple, everyday language.
 - `DATABASE_URL`: PostgreSQL connection string
 - `SESSION_SECRET`: Secret for session encryption (optional, has fallback)
 
+## Running on Replit
+
+### Prerequisites
+- The Replit built-in PostgreSQL database is used — `DATABASE_URL` is set automatically.
+- `SESSION_SECRET` is configured as a Replit Secret.
+
+### First-time setup
+```bash
+npm install          # install dependencies
+npm run db:push      # push schema to the database (also runs on post-merge)
+npm run dev          # start the development server on port 5000
+```
+
+The database is seeded automatically on first start (super admin, countries, products, tasks, payment channels, and platform settings).
+
+### Default super admin
+- **Phone**: 99935673  
+- **Country**: Togo (TG)  
+- **Password**: pagetstudio
+
+### Workflow
+The "Start application" workflow runs `npm run dev` and serves the app on port 5000 (mapped to external port 80).
+
+---
+
 ## Recent Changes (February 2026)
 - Deposit system now uses dual approach: Soleaspay (automatic) per-country OR manual recharge channels
 - Admin can enable Soleaspay globally and select specific countries for automatic payment
