@@ -35,6 +35,7 @@ export default function MyProductsPage() {
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<"our" | "my">("our");
+  const [mySubTab, setMySubTab] = useState<"fixes" | "bientot" | "commandes">("commandes");
   const [confirmProduct, setConfirmProduct] = useState<ProductWithOwnership | null>(null);
 
   const { data: products, isLoading: loadingProducts } = useQuery<ProductWithOwnership[]>({
@@ -84,6 +85,19 @@ export default function MyProductsPage() {
     const hours = String(d.getHours()).padStart(2, "0");
     const minutes = String(d.getMinutes()).padStart(2, "0");
     return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
+
+  // Format date as "20 Jul 2026, 15:00"
+  const formatPurchaseDate = (dateStr: string) => {
+    if (!dateStr) return "-";
+    const d = new Date(dateStr);
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const day = d.getDate();
+    const month = months[d.getMonth()];
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    return `${day} ${month} ${year}, ${hours}:${minutes}`;
   };
 
   return (
@@ -224,103 +238,128 @@ export default function MyProductsPage() {
 
         {/* ── MY PRODUCT tab ── */}
         {activeTab === "my" && (
-          <div className="space-y-3 mt-1">
-            {loadingUserProducts ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin" style={{ color: "#1565C0" }} />
-              </div>
-            ) : allUserProducts.length === 0 ? (
-              <div className="text-center py-16 bg-white rounded-2xl shadow-sm flex flex-col items-center gap-3">
-                <Wind className="w-12 h-12 text-gray-200" />
-                <p className="text-gray-500 font-medium">Aucun produit Doosan</p>
-                <p className="text-gray-400 text-sm">Achetez des produits pour commencer à gagner</p>
-              </div>
-            ) : (
-              allUserProducts.map((up: any, index: number) => {
-                const cycleDays = up.product?.cycleDays || 60;
-                const daysRemaining = up.daysRemaining || 0;
-                const daysCompleted = Math.max(0, cycleDays - daysRemaining);
-                const dailyEarnings = up.product?.dailyEarnings || 0;
-                const earnedSoFar = parseFloat(up.totalEarned || "0");
-                const progress = cycleDays > 0 ? Math.round((daysCompleted / cycleDays) * 100) : 0;
+          <div className="mt-1">
+            {/* Green sub-header */}
+            <div
+              className="flex items-center gap-3 px-3 py-3 rounded-2xl mb-3"
+              style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}
+            >
+              <button
+                onClick={() => setActiveTab("our")}
+                className="w-8 h-8 flex items-center justify-center bg-white/20 rounded-lg shrink-0"
+              >
+                <span className="text-white font-bold text-lg leading-none">&lt;</span>
+              </button>
+              <p className="text-white font-bold text-base flex-1 text-center pr-8">Mon produit</p>
+            </div>
 
+            {/* Three sub-tabs */}
+            <div className="flex gap-1 mb-3 bg-white rounded-xl p-1 shadow-sm">
+              {(["fixes", "bientot", "commandes"] as const).map((tab) => {
+                const labels = { fixes: "Commandes fixes", bientot: "Commandes bientôt", commandes: "Commandes" };
+                const isActive = mySubTab === tab;
                 return (
-                  <div
-                    key={up.id}
-                    className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-row"
-                    data-testid={`my-product-card-${up.id}`}
+                  <button
+                    key={tab}
+                    onClick={() => setMySubTab(tab)}
+                    className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
+                    style={{
+                      background: isActive ? "linear-gradient(135deg, #22c55e, #16a34a)" : "transparent",
+                      color: isActive ? "#fff" : "#6b7280",
+                    }}
                   >
-                    {/* Left image */}
-                    <div className="shrink-0" style={{ width: 130, height: 190 }}>
-                      <img
-                        src={PRODUCT_IMAGES[index % PRODUCT_IMAGES.length]}
-                        alt={up.product?.name || "Produit"}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+                    {labels[tab]}
+                  </button>
+                );
+              })}
+            </div>
 
-                    {/* Right info */}
-                    <div className="flex-1 flex flex-col justify-between px-3 py-3">
-                      {/* Name + date */}
-                      <div className="mb-2">
-                        <p className="font-bold text-gray-800 text-sm leading-tight">
+            {/* Product list */}
+            <div className="space-y-3">
+              {loadingUserProducts ? (
+                <div className="flex justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin" style={{ color: "#22c55e" }} />
+                </div>
+              ) : allUserProducts.length === 0 ? (
+                <div className="text-center py-16 bg-white rounded-2xl shadow-sm flex flex-col items-center gap-3">
+                  <Wind className="w-12 h-12 text-gray-200" />
+                  <p className="text-gray-500 font-medium">Aucun produit Doosan</p>
+                  <p className="text-gray-400 text-sm">Achetez des produits pour commencer à gagner</p>
+                </div>
+              ) : (
+                allUserProducts.map((up: any, index: number) => {
+                  const cycleDays = up.product?.cycleDays || 60;
+                  const daysRemaining = up.daysRemaining || 0;
+                  const daysCompleted = Math.max(0, cycleDays - daysRemaining);
+                  const earnedSoFar = parseFloat(up.totalEarned || "0");
+
+                  return (
+                    <div
+                      key={up.id}
+                      className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-row"
+                      data-testid={`my-product-card-${up.id}`}
+                    >
+                      {/* Left image */}
+                      <div className="shrink-0" style={{ width: 120, height: 175 }}>
+                        <img
+                          src={PRODUCT_IMAGES[index % PRODUCT_IMAGES.length]}
+                          alt={up.product?.name || "Produit"}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* Right info */}
+                      <div className="flex-1 px-3 py-3 space-y-1.5">
+                        {/* Product name */}
+                        <p className="font-bold text-gray-800 text-sm leading-tight mb-2">
                           {up.product?.name || "Produit"}
                         </p>
-                        <p className="text-gray-400 text-[10px] mt-0.5">{formatDateTime(up.purchasedAt)}</p>
-                      </div>
 
-                      {/* Stats */}
-                      <div className="space-y-1 mb-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-400 text-[11px]">Prix unitaire</span>
-                          <span className="font-bold text-[11px]" style={{ color: "#1565C0" }}>
-                            {currency} {Number(up.product?.price || 0).toLocaleString("fr-FR")}
+                        {/* Prix unitaire */}
+                        <div className="flex justify-between items-start">
+                          <span className="text-gray-500 text-[11px]">Prix unitaire</span>
+                          <span className="font-bold text-[12px]" style={{ color: "#22c55e" }}>
+                            {Number(up.product?.price || 0).toLocaleString("fr-FR")}
                           </span>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-400 text-[11px]">Validité</span>
-                          <span className="font-bold text-[11px]" style={{ color: "#1565C0" }}>
-                            {cycleDays} Jours
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-400 text-[11px]">Gains quotidiens</span>
-                          <span className="font-bold text-[11px]" style={{ color: "#1565C0" }}>
-                            {currency} {Number(dailyEarnings).toLocaleString("fr-FR")}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-400 text-[11px]">Revenu total</span>
-                          <span className="font-bold text-[11px]" style={{ color: "#1565C0" }}>
-                            {currency} {Number(up.product?.totalReturn || 0).toLocaleString("fr-FR")}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-400 text-[11px]">Revenus reçus</span>
-                          <span className="font-bold text-[11px]" style={{ color: "#22c55e" }}>
-                            {currency} {earnedSoFar.toLocaleString("fr-FR")}
-                          </span>
-                        </div>
-                      </div>
 
-                      {/* Progress bar */}
-                      <div>
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-gray-400 text-[10px]">{daysCompleted}/{cycleDays} jours</span>
-                          <span className="text-[10px] font-bold" style={{ color: "#1565C0" }}>{progress}%</span>
+                        {/* Jours d'exécution */}
+                        <div className="flex justify-between items-start">
+                          <span className="text-gray-500 text-[11px]">Jours d'exécution</span>
+                          <span className="font-bold text-[12px]" style={{ color: "#22c55e" }}>
+                            {daysCompleted} / {cycleDays} Jours
+                          </span>
                         </div>
-                        <div className="w-full bg-gray-100 rounded-full h-1.5">
-                          <div
-                            className="h-1.5 rounded-full"
-                            style={{ width: `${progress}%`, background: "linear-gradient(90deg, #1565C0, #1E88E5)" }}
-                          />
+
+                        {/* Revenu généré */}
+                        <div className="flex justify-between items-start">
+                          <span className="text-gray-500 text-[11px]">Revenu généré (Paid)</span>
+                          <span className="font-bold text-[12px]" style={{ color: "#22c55e" }}>
+                            {earnedSoFar.toLocaleString("fr-FR")}
+                          </span>
+                        </div>
+
+                        {/* Revenu total attendu */}
+                        <div className="flex justify-between items-start">
+                          <span className="text-gray-500 text-[11px]">Revenu total attendu</span>
+                          <span className="font-bold text-[12px]" style={{ color: "#22c55e" }}>
+                            {Number(up.product?.totalReturn || 0).toLocaleString("fr-FR")}
+                          </span>
+                        </div>
+
+                        {/* Date & heure */}
+                        <div className="flex justify-between items-start">
+                          <span className="text-gray-500 text-[11px]">Date &amp; heure</span>
+                          <span className="font-bold text-[12px] text-right" style={{ color: "#22c55e" }}>
+                            {formatPurchaseDate(up.purchasedAt)}
+                          </span>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })
-            )}
+                  );
+                })
+              )}
+            </div>
           </div>
         )}
       </div>
