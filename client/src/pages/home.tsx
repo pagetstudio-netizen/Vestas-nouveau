@@ -13,10 +13,10 @@ import iconBell      from "@assets/d68b81d4-3a8a-4ba0-804f-d77f381cb5ab_17847564
 import iconGift      from "@assets/0dbab192-27c3-4e50-8c09-17603ef394d1_1784756497610.png";
 import bgDoosan      from "@assets/téléchargement_(18)_1784756497633.jpeg";
 import bgConference  from "@assets/téléchargement_(15)_1784756497654.jpeg";
+import bgCumul       from "@assets/téléchargement_(17)_1784756905309.jpeg";
 import iconRecharger from "@assets/1-1_1783245823715.png";
 import iconRetraits  from "@assets/2-1_1783245823825.png";
 import iconService   from "@assets/3-1_1783245823860.png";
-import bannerBottom  from "@assets/téléchargement_(16)_1784561452683.jpeg";
 
 /* CSS filter : tinte la cloche en or/ambré */
 const BELL_COLOR = "brightness(0) saturate(100%) invert(78%) sepia(80%) saturate(600%) hue-rotate(5deg) brightness(105%)";
@@ -282,14 +282,15 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Revenu cumulé — Doosan blue gradient */}
+          {/* Revenu cumulé — turbine bg */}
           <div
             className="rounded-2xl overflow-hidden relative shadow-sm"
-            style={{ height: 100, background: "linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)" }}
+            style={{ height: 100 }}
           >
+            <img src={bgCumul} alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
             <div
-              className="absolute inset-0 opacity-15"
-              style={{ backgroundImage: "radial-gradient(circle at 75% 25%, #fff 0%, transparent 60%)" }}
+              className="absolute inset-0"
+              style={{ background: "rgba(0,0,0,0.55)" }}
             />
             <div className="relative z-10 p-3 flex flex-col justify-between h-full">
               <p className="text-white/80 text-[10px] font-bold uppercase tracking-wider">
@@ -305,11 +306,6 @@ export default function HomePage() {
           </div>
 
         </div>
-      </div>
-
-      {/* ── BOTTOM DECORATIVE BANNER ── */}
-      <div className="mx-3 mt-3 rounded-2xl overflow-hidden shadow-sm" style={{ height: 180 }}>
-        <img src={bannerBottom} alt="Doosan" className="w-full h-full object-cover" />
       </div>
 
       <div className="pb-28" />
