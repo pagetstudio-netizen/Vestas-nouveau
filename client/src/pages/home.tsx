@@ -172,7 +172,7 @@ export default function HomePage() {
           onClick={() => navigate("/")}
         />
         <button
-          onClick={() => navigate("/tasks")}
+          onClick={() => navigate("/checkin")}
           className="text-[10px] font-bold px-3 py-1 rounded-full text-white"
           style={{ background: "linear-gradient(135deg, #1565C0, #1E88E5)" }}
         >
