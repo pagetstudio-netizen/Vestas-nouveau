@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { ChevronLeft, User } from "lucide-react";
+import emptyIllustration from "@assets/illustration-8_1784762965573.png";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
 import { getCountryByCode } from "@/lib/countries";
@@ -156,13 +157,8 @@ export default function TeamDetailsPage() {
             <Skeleton key={i} className="h-16 w-full rounded-2xl" />
           ))
         ) : members.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm text-center py-14 px-6">
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3"
-              style={{ backgroundColor: GREEN_BG }}
-            >
-              <User className="w-7 h-7" style={{ color: GREEN }} />
-            </div>
+          <div className="bg-white rounded-2xl shadow-sm text-center py-10 px-6 flex flex-col items-center gap-2">
+            <img src={emptyIllustration} alt="Vide" className="w-40 h-40 object-contain opacity-90" />
             <p className="text-gray-500 text-sm font-medium">
               Aucun membre au niveau {activeLevel}
             </p>

@@ -9,6 +9,7 @@ import { useLocation } from "wouter";
 import type { Product } from "@shared/schema";
 
 import vestasLogo from "@assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Corporation_-_Logo.s_1784561452870.png";
+import emptyIllustration from "@assets/illustration-8_1784762965573.png";
 import serviceIcon from "@assets/20260311_214852_1773265973964.png";
 import btnOurProducts from "@assets/20260721_173328_1784656524037.png";
 import btnMyProduct from "@assets/20260721_173249_1784656523987.png";
@@ -163,8 +164,8 @@ export default function MyProductsPage() {
                 <Loader2 className="w-8 h-8 animate-spin" style={{ color: "#1565C0" }} />
               </div>
             ) : paidProducts.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-2xl shadow-sm flex flex-col items-center gap-3">
-                <Settings className="w-12 h-12 text-gray-200" />
+              <div className="text-center py-8 bg-white rounded-2xl shadow-sm flex flex-col items-center gap-2">
+                <img src={emptyIllustration} alt="Vide" className="w-40 h-40 object-contain opacity-90" />
                 <p className="text-gray-400 font-medium">Aucun produit disponible</p>
               </div>
             ) : (
@@ -245,8 +246,8 @@ export default function MyProductsPage() {
                   <Loader2 className="w-8 h-8 animate-spin" style={{ color: "#22c55e" }} />
                 </div>
               ) : allUserProducts.length === 0 ? (
-                <div className="text-center py-16 bg-white rounded-2xl shadow-sm flex flex-col items-center gap-3">
-                  <Wind className="w-12 h-12 text-gray-200" />
+                <div className="text-center py-8 bg-white rounded-2xl shadow-sm flex flex-col items-center gap-2">
+                  <img src={emptyIllustration} alt="Vide" className="w-40 h-40 object-contain opacity-90" />
                   <p className="text-gray-500 font-medium">Aucun produit Doosan</p>
                   <p className="text-gray-400 text-sm">Achetez des produits pour commencer à gagner</p>
                 </div>

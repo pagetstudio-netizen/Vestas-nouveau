@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { getPaymentMethodsForCountry, type ApiCountry } from "@/lib/countries";
 import { Loader2, Plus, Trash2, CreditCard, ChevronLeft, ChevronRight, Shield, Check } from "lucide-react";
+import emptyIllustration from "@assets/illustration-8_1784762965573.png";
 import { Link, useLocation, useSearch } from "wouter";
 import type { WithdrawalWallet } from "@shared/schema";
 
@@ -345,10 +346,8 @@ export default function WalletPage() {
             </div>
           ))
         ) : (
-          <div className="text-center py-16">
-            <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-4">
-              <CreditCard className="w-8 h-8 text-[#003366]" />
-            </div>
+          <div className="text-center py-10 flex flex-col items-center gap-2">
+            <img src={emptyIllustration} alt="Vide" className="w-40 h-40 object-contain opacity-90" />
             <p className="text-gray-500 text-sm">Aucun compte bancaire enregistré</p>
             <p className="text-gray-400 text-xs mt-1">Ajoutez un compte pour effectuer des retraits</p>
           </div>

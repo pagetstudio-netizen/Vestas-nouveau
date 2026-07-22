@@ -8,6 +8,7 @@ import { ChevronLeft, Loader2, Trophy, CheckCircle2 } from "lucide-react";
 import { Link } from "wouter";
 import type { Task } from "@shared/schema";
 import jollibeeImg from "@assets/téléchargement_(19)_1784561452588.jpeg";
+import emptyIllustration from "@assets/illustration-8_1784762965573.png";
 import jollibeeLogo from "@assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Corporation_-_Logo.s_1784561452870.png";
 import iconBronze from "@assets/344464_1773318022355.png";
 import iconArgent from "@assets/817729_1773318022328.png";
@@ -263,8 +264,8 @@ export default function TasksPage() {
             })}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <Trophy className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+          <div className="text-center py-10 flex flex-col items-center gap-2">
+            <img src={emptyIllustration} alt="Vide" className="w-40 h-40 object-contain opacity-90" />
             <p className="text-gray-500">Aucune tâche disponible</p>
           </div>
         )}

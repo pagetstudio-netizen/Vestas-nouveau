@@ -5,7 +5,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatCurrency, getCountryByCode } from "@/lib/countries";
-import { Loader2, AlertTriangle, Settings } from "lucide-react";
+import { Loader2, AlertTriangle } from "lucide-react";
+import emptyIllustration from "@assets/illustration-8_1784762965573.png";
 import { useLocation } from "wouter";
 import type { Product } from "@shared/schema";
 
@@ -181,8 +182,8 @@ export default function InvestPage() {
             );
           })
         ) : (
-          <div className="text-center py-16">
-            <Settings className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <div className="text-center py-8 flex flex-col items-center gap-2">
+            <img src={emptyIllustration} alt="Vide" className="w-40 h-40 object-contain opacity-90" />
             <p className="text-gray-400 text-sm">
               {activeTab === "mine" ? "Vous n'avez aucun produit actif" : "Aucun produit disponible"}
             </p>

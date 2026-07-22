@@ -1,3 +1,4 @@
+import emptyIllustration from "@assets/illustration-8_1784762965573.png";
 import { useAuth } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
@@ -67,7 +68,8 @@ export default function DepositHistoryPage() {
             ))}
           </div>
         ) : withdrawals.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-10 flex flex-col items-center gap-3">
+            <img src={emptyIllustration} alt="Aucun retrait" className="w-40 h-40 object-contain opacity-90" />
             <p className="text-gray-500">Aucun retrait effectue</p>
           </div>
         ) : (

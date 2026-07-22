@@ -1,3 +1,4 @@
+import emptyIllustration from "@assets/illustration-8_1784762965573.png";
 import { useAuth } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
@@ -54,7 +55,8 @@ export default function DepositOrdersPage() {
             <Skeleton key={i} className="h-28 w-full rounded-2xl" />
           ))
         ) : deposits.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="text-center py-10 flex flex-col items-center gap-3">
+            <img src={emptyIllustration} alt="Aucun dépôt" className="w-40 h-40 object-contain opacity-90" />
             <p className="text-gray-400 text-sm">Aucun dépôt pour le moment</p>
           </div>
         ) : (
