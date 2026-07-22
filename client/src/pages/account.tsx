@@ -68,8 +68,6 @@ export default function AccountPage() {
 
   /* ── menu list ── */
   const menuItems = [
-    { icon: doosanLogo,    label: "Mes robots",              href: "/invest",          isLogo: true  },
-    { icon: iconSalaire,   label: "Récompense Salariale",    href: "/salary-bonus",    isLogo: false },
     { icon: iconWallet,    label: "Ma carte bancaire",       href: "/wallet",          isLogo: false },
     { icon: iconChangePwd, label: "Sécurité",               href: "/change-password", isLogo: false },
     { icon: iconAbout,     label: "À propos de nous",        href: "/about",           isLogo: false },
@@ -135,31 +133,6 @@ export default function AccountPage() {
               />
             </div>
           </div>
-        </div>
-
-        {/* ══════════════════════════════════════════
-            "MON APPAREIL" banner card
-        ══════════════════════════════════════════ */}
-        <div className="px-3 mt-3">
-          <button
-            onClick={() => navigate("/salary-bonus")}
-            className="w-full rounded-xl overflow-hidden text-left active:opacity-80 transition-opacity flex items-center justify-between px-4 py-4"
-            style={{
-              background: "linear-gradient(120deg, #0d1b2a 0%, #1a2e44 60%, #1a3a5c 100%)",
-              minHeight: 72,
-            }}
-          >
-            <div className="flex-1">
-              <p className="text-white font-bold text-[15px] leading-tight">Récompense Salariale</p>
-              <p className="text-white/50 text-xs mt-1">Afficher mes récompenses et bonus salariaux</p>
-            </div>
-            <span
-              className="ml-3 text-white font-bold text-sm px-4 py-1.5 rounded-lg shrink-0"
-              style={{ background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.25)" }}
-            >
-              Aller
-            </span>
-          </button>
         </div>
 
         {/* ══════════════════════════════════════════
