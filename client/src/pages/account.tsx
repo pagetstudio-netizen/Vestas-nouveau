@@ -141,8 +141,8 @@ export default function AccountPage() {
             }}
           >
             <div className="flex-1">
-              <p className="text-white font-bold text-[15px] leading-tight">Mon appareil</p>
-              <p className="text-white/50 text-xs mt-1">Afficher les revenus de mon appareil</p>
+              <p className="text-white font-bold text-[15px] leading-tight">Récompense Salariale</p>
+              <p className="text-white/50 text-xs mt-1">Afficher mes récompenses et bonus salariaux</p>
             </div>
             <span
               className="ml-3 text-white font-bold text-sm px-4 py-1.5 rounded-lg shrink-0"
