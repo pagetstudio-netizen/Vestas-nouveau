@@ -17,6 +17,7 @@ import {
   createPayment as sendavapayCreate,
   initiatePayment as sendavapayInitiate,
   submitOtp as sendavapaySubmitOtp,
+  retryPayment as sendavapayRetry,
   verifyPayment as sendavapayVerify,
   verifyWebhookSignature as sendavapayVerifySignature,
   mapSendavapayStatus,
@@ -973,7 +974,7 @@ export async function registerRoutes(
     }
   });
 
-  // Submit OTP (proxy)
+  // Submit OTP — CLIENT (CORS) endpoint, no SDK key
   app.post("/api/sendavapay/submit-otp", requireAuth, async (req, res) => {
     try {
       const { otpToken, otp } = req.body;
@@ -988,7 +989,26 @@ export async function registerRoutes(
     }
   });
 
-  // Poll payment status
+  // Retry a failed payment — CLIENT (CORS) endpoint, no SDK key
+  app.post("/api/sendavapay/retry", requireAuth, async (req, res) => {
+    try {
+      const { paymentToken, depositId } = req.body;
+      if (!paymentToken) {
+        return res.status(400).json({ message: "paymentToken requis" });
+      }
+      // Reset deposit status to processing
+      if (depositId) {
+        await storage.updateDeposit(depositId, { status: "processing" });
+      }
+      const result = await sendavapayRetry(paymentToken);
+      res.json(result);
+    } catch (error: any) {
+      console.error("[sendavapay] retry error:", error);
+      res.status(500).json({ message: error.message || "Erreur serveur" });
+    }
+  });
+
+  // Poll payment status using GET /payment-status/:reference (lighter than verify-payment)
   app.get("/api/deposits/:id/sendavapay-status", requireAuth, async (req, res) => {
     try {
       const depositId = parseInt(req.params.id);
@@ -1004,12 +1024,18 @@ export async function registerRoutes(
         return res.json({ status: deposit.status });
       }
 
-      const verifyResult = await sendavapayVerify(deposit.sendavapayReference);
-      if (!verifyResult.success || !verifyResult.data) {
+      // Use lightweight GET payment-status endpoint for polling
+      const statusRes = await fetch(
+        `${process.env.SENDAVAPAY_API_BASE || "https://sendavapay.com/api/sdk/v1"}/payment-status/${deposit.sendavapayReference}`,
+        { headers: { Authorization: `Bearer ${process.env.SENDAVAPAY_API_KEY || ""}` } }
+      );
+      const statusData = await statusRes.json() as { success: boolean; data?: { status: string } };
+
+      if (!statusData.success || !statusData.data) {
         return res.json({ status: deposit.status });
       }
 
-      const newStatus = mapSendavapayStatus(verifyResult.data.status);
+      const newStatus = mapSendavapayStatus(statusData.data.status);
       if (newStatus !== "pending" && newStatus !== deposit.status) {
         await storage.updateDeposit(depositId, { status: newStatus, processedAt: new Date() });
 
@@ -1032,7 +1058,7 @@ export async function registerRoutes(
         }
       }
 
-      res.json({ status: newStatus || deposit.status, rawStatus: verifyResult.data.status });
+      res.json({ status: newStatus || deposit.status, rawStatus: statusData.data.status });
     } catch (error: any) {
       console.error("[sendavapay] status check error:", error);
       res.status(500).json({ message: error.message });

@@ -158,13 +158,17 @@ export function mapSendavapayStatus(
 
 // ── Client/CORS API proxies (called from our backend on behalf of frontend) ─
 
-// Pure-push SDK: no redirect, no widget, no iframe.
-// After initiate-payment the operator pushes a USSD/confirmation to the user's phone.
-// The only two paths are: requiresOtp=true (user enters code) or success (wait for webhook).
+// initiate-payment is a CLIENT (CORS) endpoint — authenticated by paymentToken only,
+// no SDK key required. Three possible outcomes from the API:
+//   1. requiresOtp: true  → Orange Money; user must enter SMS OTP
+//   2. requiresRedirect: true → Wave etc.; user must open redirectUrl
+//   3. success: true (neither) → push invite sent to phone; wait for webhook
 interface InitiatePaymentResponse {
   success: boolean;
   requiresOtp?: boolean;
   otpToken?: string;
+  requiresRedirect?: boolean;
+  redirectUrl?: string;
   reference?: string;
   message?: string;
   error?: string;
@@ -188,12 +192,10 @@ export async function initiatePayment(params: {
   };
   if (params.payerEmail) body.payerEmail = params.payerEmail;
 
+  // No SDK key — this endpoint is CORS-enabled and authenticated via paymentToken
   const response = await fetch(`${SENDAVAPAY_API_BASE}/initiate-payment`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${getApiKey()}`,
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
 
@@ -211,16 +213,33 @@ export async function submitOtp(params: {
   otpToken: string;
   otp: string;
 }): Promise<SubmitOtpResponse> {
+  // CLIENT (CORS) endpoint — no SDK key, authenticated via otpToken
   const response = await fetch(`${SENDAVAPAY_API_BASE}/submit-otp`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${getApiKey()}`,
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ otpToken: params.otpToken, otp: params.otp }),
   });
 
   return response.json() as Promise<SubmitOtpResponse>;
+}
+
+// Resets a failed payment back to pending so it can be re-initiated.
+// CLIENT (CORS) endpoint — no SDK key, authenticated via paymentToken.
+interface RetryPaymentResponse {
+  success: boolean;
+  reference?: string;
+  status?: string;
+  message?: string;
+  error?: string;
+}
+
+export async function retryPayment(paymentToken: string): Promise<RetryPaymentResponse> {
+  const response = await fetch(`${SENDAVAPAY_API_BASE}/retry-payment`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ paymentToken }),
+  });
+  return response.json() as Promise<RetryPaymentResponse>;
 }
 
 // ── Webhook signature verification ─────────────────────────────────────────
