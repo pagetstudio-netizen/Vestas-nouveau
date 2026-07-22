@@ -116,13 +116,22 @@ export default function AccountPage() {
               </div>
             </div>
 
-            {/* RIGHT: robot image — overflows bottom slightly */}
-            <div className="relative" style={{ width: 140, marginBottom: -20 }}>
+            {/* RIGHT: robot image with bottom fade */}
+            <div className="relative" style={{ width: 140, height: 190 }}>
               <img
                 src={robotImg}
                 alt="Robot Doosan"
-                className="absolute bottom-0 right-0 w-full object-contain drop-shadow-2xl"
-                style={{ maxHeight: 200 }}
+                className="absolute bottom-0 right-0 w-full object-contain"
+                style={{ maxHeight: 190 }}
+              />
+              {/* gradient fade bottom */}
+              <div
+                className="absolute bottom-0 left-0 right-0"
+                style={{
+                  height: 60,
+                  background: "linear-gradient(to top, #000 0%, transparent 100%)",
+                  pointerEvents: "none",
+                }}
               />
             </div>
           </div>
