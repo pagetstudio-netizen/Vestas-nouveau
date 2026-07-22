@@ -13,9 +13,6 @@ import { useToast } from "@/hooks/use-toast";
 import robotImg      from "@assets/ai-robot-typing-on-ipad-isolated-on-transparent-background-fre_1784755325508.png";
 import doosanLogo    from "@assets/channels4_profile_1784755325592.jpg";
 import iconBell      from "@assets/d68b81d4-3a8a-4ba0-804f-d77f381cb5ab_1784756176031.png";
-import iconGiftNew   from "@assets/0dbab192-27c3-4e50-8c09-17603ef394d1_1784756176118.png";
-import bgDoosan      from "@assets/téléchargement_(18)_1784756176152.jpeg";
-import bgConference  from "@assets/téléchargement_(15)_1784756176133.jpeg";
 
 import iconRecords    from "@assets/mine-mod-records-DgHXSKa1_1782689837747.png";
 import iconAbout      from "@assets/mine-mod-aboutus-xnaBhqOq_1782689895455.png";
@@ -131,10 +128,9 @@ export default function AccountPage() {
           style={{ background: "#111", border: "1px solid #222" }}
         >
           {[
-            { icon: iconRecharger, label: "Recharger",   href: "/deposit",    raw: false },
-            { icon: iconRetraits,  label: "Retirer",     href: "/withdrawal", raw: false },
-            { icon: iconRecords,   label: "Registres",   href: "/history",    raw: false },
-            { icon: iconGiftNew,   label: "Code cadeau", href: "/gift-code",  raw: true  },
+            { icon: iconRecharger, label: "Recharger", href: "/deposit",    raw: false },
+            { icon: iconRetraits,  label: "Retirer",   href: "/withdrawal", raw: false },
+            { icon: iconRecords,   label: "Registres", href: "/history",    raw: false },
           ].map((item, i) => (
             <Link href={item.href} key={i}>
               <button className="flex flex-col items-center justify-center gap-2 py-4 w-full active:bg-white/5 rounded-2xl">
@@ -167,70 +163,6 @@ export default function AccountPage() {
             <p className="marquee-track text-white/80 text-xs font-medium">
               {noticeText}
             </p>
-          </div>
-        </div>
-
-        {/* ═══ Stat cards with background images — BIGGER ═══ */}
-        <div className="mx-4 mt-3 grid grid-cols-2 gap-3">
-
-          {/* Card 1 — Balance (tall, Doosan Robotics bg) */}
-          <div
-            className="rounded-2xl overflow-hidden relative"
-            style={{ height: 210 }}
-          >
-            <img src={bgDoosan} alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
-            <div
-              className="absolute inset-0"
-              style={{ background: "linear-gradient(160deg, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.38) 100%)" }}
-            />
-            <div className="relative z-10 p-4 flex flex-col justify-between h-full">
-              <p className="text-white/80 text-xs font-bold uppercase tracking-wider">Balance</p>
-              <div>
-                <p className="text-white font-extrabold text-2xl leading-tight" data-testid="text-balance-card">
-                  {balance.toFixed(2)}
-                </p>
-                <p className="text-white/70 text-[11px] mt-0.5">{currency}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Right column — 2 stacked cards */}
-          <div className="flex flex-col gap-3">
-
-            {/* Card 2 — Cumulatif (conference bg) */}
-            <div
-              className="rounded-2xl overflow-hidden relative"
-              style={{ height: 100 }}
-            >
-              <img src={bgConference} alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
-              <div
-                className="absolute inset-0"
-                style={{ background: "rgba(0,0,0,0.58)" }}
-              />
-              <div className="relative z-10 p-3 flex flex-col justify-between h-full">
-                <p className="text-white/80 text-[10px] font-bold uppercase tracking-wider">Cumulatif</p>
-                <p className="text-white font-extrabold text-lg leading-none" data-testid="text-earnings-card">
-                  {totalEarnings.toFixed(2)}
-                  <span className="text-[10px] font-normal text-white/70 ml-1">{currency}</span>
-                </p>
-              </div>
-            </div>
-
-            {/* Card 3 — Produits actifs (Doosan blue gradient) */}
-            <div
-              className="rounded-2xl overflow-hidden relative"
-              style={{ height: 100, background: "linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)" }}
-            >
-              <div
-                className="absolute inset-0 opacity-15"
-                style={{ backgroundImage: "radial-gradient(circle at 75% 25%, #fff 0%, transparent 60%)" }}
-              />
-              <div className="relative z-10 p-3 flex flex-col justify-between h-full">
-                <p className="text-white/80 text-[10px] font-bold uppercase tracking-wider">Produits actifs</p>
-                <p className="text-white font-extrabold text-3xl leading-none">{activeProducts}</p>
-              </div>
-            </div>
-
           </div>
         </div>
 
