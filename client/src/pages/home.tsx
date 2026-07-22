@@ -10,7 +10,7 @@ import jollibeeLogo  from "@assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Cor
 import heroImg       from "@assets/téléchargement_(16)_1784561452683.jpeg";
 import bellIcon      from "@assets/d7d9f6f6-dddc-4071-8bc2-d6e7e589fbae_(1)_1783248684110.png";
 import iconBell      from "@assets/d68b81d4-3a8a-4ba0-804f-d77f381cb5ab_1784756497520.png";
-import iconGift      from "@assets/0dbab192-27c3-4e50-8c09-17603ef394d1_1784756497610.png";
+import iconSignin    from "@assets/icon-signin.png";
 import bgDoosan      from "@assets/téléchargement_(18)_1784756497633.jpeg";
 import bgConference  from "@assets/téléchargement_(15)_1784756497654.jpeg";
 import bgCumul       from "@assets/téléchargement_(17)_1784756905309.jpeg";
@@ -192,7 +192,7 @@ export default function HomePage() {
             { icon: iconRecharger, label: "Dépôt en ligne",   href: "/deposit",    mask: true },
             { icon: iconRetraits,  label: "Retrait en ligne", href: "/withdrawal", mask: true },
             { icon: iconService,   label: "Service client",   href: "/service",    mask: true },
-            { icon: iconGift,      label: "Code cadeau",      href: "/gift-code",  mask: true  },
+            { icon: iconSignin,    label: "S'identifier",     href: "/checkin",    mask: true  },
           ].map((item, i) => (
             <button
               key={i}
