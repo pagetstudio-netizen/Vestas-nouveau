@@ -161,86 +161,57 @@ export default function InvestPage() {
       {/* Purchase confirm modal */}
       {confirmProduct && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center px-5 bg-black/60"
+          className="fixed inset-0 z-50 flex items-center justify-center px-6 bg-black/50"
           onClick={() => setConfirmProduct(null)}
         >
           <div
-            className="w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl"
-            style={{ background: "linear-gradient(160deg, #1565C0 0%, #0D47A1 100%)" }}
+            className="w-full max-w-xs rounded-2xl overflow-hidden shadow-2xl bg-white"
             onClick={e => e.stopPropagation()}
           >
-            {/* Title */}
-            <div className="pt-6 px-6 pb-3">
-              <h3 className="text-white text-2xl font-black">{confirmProduct.name}</h3>
-              <p className="text-white/70 text-sm mt-1">
-                Après l'achat du produit, vos gains seront crédités sur votre compte toutes les 24 heures.
+            {/* Header band — "Conseil" */}
+            <div className="px-5 pt-5 pb-1 text-center">
+              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Conseil</p>
+              <p className="text-gray-800 font-semibold text-base leading-snug">
+                Êtes-vous sûr de vouloir acheter ce produit ?
               </p>
-            </div>
-
-            {/* Image + Info row */}
-            <div className="flex items-center gap-4 px-6 py-3">
-              <div className="w-28 h-24 rounded-2xl overflow-hidden shrink-0 shadow-lg">
-                <img
-                  src={PRODUCT_IMAGES[(confirmProduct.sortOrder || 0) % PRODUCT_IMAGES.length]}
-                  alt={confirmProduct.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex-1 space-y-1.5">
-                <div>
-                  <p className="text-white/60 text-xs">Prix</p>
-                  <p className="text-white font-bold text-sm">{currency} {Number(confirmProduct.price).toLocaleString("fr-FR")}</p>
-                </div>
-                <div>
-                  <p className="text-white/60 text-xs">Revenu quotidien</p>
-                  <p className="text-white font-bold text-sm">{currency} {Number(confirmProduct.dailyEarnings).toLocaleString("fr-FR")}</p>
-                </div>
-                <div>
-                  <p className="text-white/60 text-xs">Revenu total</p>
-                  <p className="text-white font-bold text-sm">{currency} {Number(confirmProduct.totalReturn).toLocaleString("fr-FR")}</p>
-                </div>
-                <div>
-                  <p className="text-white/60 text-xs">Période de validité</p>
-                  <p className="text-white font-bold text-sm">{confirmProduct.cycleDays} jours</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Warning */}
-            <div className="mx-6 mb-3">
-              {balance < confirmProduct.price ? (
-                <div className="flex items-center gap-2 p-2.5 bg-red-500/20 border border-red-400/30 rounded-xl">
-                  <AlertTriangle className="w-4 h-4 text-red-300 shrink-0" />
-                  <p className="text-xs text-red-200">
-                    Solde insuffisant. Il vous manque {formatCurrency(confirmProduct.price - balance, user.country)}.
+              <p className="text-gray-500 text-xs mt-2">
+                <span className="font-bold text-gray-700">{confirmProduct.name}</span>
+                {" · "}{currency} {Number(confirmProduct.price).toLocaleString("fr-FR")}
+              </p>
+              {balance < confirmProduct.price && (
+                <div className="flex items-center justify-center gap-1.5 mt-3 p-2 bg-amber-50 border border-amber-200 rounded-xl">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <p className="text-xs text-amber-700">
+                    Solde insuffisant — manque {formatCurrency(confirmProduct.price - balance, user.country)}
                   </p>
                 </div>
-              ) : (
-                <p className="text-white/70 text-xs text-center font-semibold">
-                  Chaque personne ne peut acheter qu'un seul article par jour.
-                </p>
               )}
             </div>
 
+            {/* Divider */}
+            <div className="h-px bg-gray-100 mx-0 mt-5" />
+
             {/* Buttons */}
-            <div className="flex gap-3 px-6 pb-6 pt-1">
+            <div className="flex">
               <button
                 onClick={() => setConfirmProduct(null)}
-                className="flex-1 py-3 rounded-full font-semibold text-sm"
-                style={{ background: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.8)" }}
+                className="flex-1 py-4 font-semibold text-base text-gray-500 active:bg-gray-50 transition-colors"
+                style={{ borderRight: "1px solid #f0f0f0" }}
                 data-testid="button-cancel-purchase"
               >
-                Annuler
+                Non
               </button>
               <button
                 onClick={() => purchaseMutation.mutate(confirmProduct.id)}
-                disabled={purchaseMutation.isPending || balance < confirmProduct.price}
-                className="flex-1 py-3 rounded-full text-white font-bold text-sm flex items-center justify-center gap-1 disabled:opacity-50"
-                style={{ background: "linear-gradient(135deg, #1E88E5, #004499)" }}
+                disabled={purchaseMutation.isPending}
+                className="flex-1 py-4 font-bold text-base text-white flex items-center justify-center gap-1.5 active:opacity-90 transition-opacity"
+                style={{ background: "#22c55e" }}
                 data-testid="button-confirm-purchase"
               >
-                {purchaseMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                Confirmer
+                {purchaseMutation.isPending
+                  ? <Loader2 className="w-4 h-4 animate-spin" />
+                  : "Oui"
+                }
               </button>
             </div>
           </div>
