@@ -133,7 +133,7 @@ export default function AccountPage() {
         ══════════════════════════════════════════ */}
         <div className="px-3 mt-3">
           <button
-            onClick={() => navigate("/invest")}
+            onClick={() => navigate("/salary-bonus")}
             className="w-full rounded-xl overflow-hidden text-left active:opacity-80 transition-opacity flex items-center justify-between px-4 py-4"
             style={{
               background: "linear-gradient(120deg, #0d1b2a 0%, #1a2e44 60%, #1a3a5c 100%)",
