@@ -46,12 +46,14 @@ export default function DepositPage() {
 
   // SendavaPay state
   const [svCountry, setSvCountry] = useState(user?.country || "");
-  const [svPhone, setSvPhone] = useState(user?.phone || "");
+  const [svPhone, setSvPhone] = useState("");
   const [svOperator, setSvOperator] = useState<SvOperator | null>(null);
   const [svDepositId, setSvDepositId] = useState<number | null>(null);
   const [svPaymentToken, setSvPaymentToken] = useState<string>("");
   const [svOtpToken, setSvOtpToken] = useState<string>("");
   const [svOtp, setSvOtp] = useState<string>("");
+  const [svUssdCode, setSvUssdCode] = useState<string>("");
+  const [svOtpMessage, setSvOtpMessage] = useState<string>("");
   const [svRedirectUrl, setSvRedirectUrl] = useState<string>("");
   const [svStatus, setSvStatus] = useState<string>("");
   const [svPolling, setSvPolling] = useState(false);
@@ -235,8 +237,10 @@ export default function DepositPage() {
         setSvRedirectUrl(data.redirectUrl);
         setStep("sv-redirect");
       } else if (data.requiresOtp && data.otpToken) {
-        // Orange Money (BF, CI, GN, ML, SN) — user receives SMS OTP
+        // Orange Money (BF, CI, GN, ML, SN) — user must dial USSD then enter OTP
         setSvOtpToken(data.otpToken);
+        setSvUssdCode(data.ussdCode || "");
+        setSvOtpMessage(data.message || "");
         setStep("sv-otp");
       } else if (data.success) {
         // Standard push: invite sent directly to phone — wait for webhook
@@ -717,24 +721,49 @@ export default function DepositPage() {
         </button>
       </header>
 
-      <div className="p-4 space-y-6 pb-10">
-        <div className="text-center pt-4">
-          <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
-            <Phone className="w-8 h-8 text-orange-500" />
+      <div className="p-4 space-y-5 pb-10">
+
+        {/* Step 1 — Dial USSD code */}
+        <div className="rounded-2xl border-2 border-orange-200 bg-orange-50 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0">
+              <span className="text-white font-bold text-xs">1</span>
+            </div>
+            <p className="font-bold text-gray-900 text-sm">Composez ce code sur votre téléphone</p>
           </div>
-          <p className="font-bold text-gray-900 text-lg">Code OTP reçu par SMS</p>
-          <p className="text-sm text-gray-500 mt-1">Entrez le code reçu sur votre téléphone pour confirmer le paiement de <strong>{Number(amount).toLocaleString()} {currency}</strong></p>
+          {svUssdCode ? (
+            <div className="bg-white rounded-xl border border-orange-200 px-4 py-3 text-center">
+              <p className="font-mono font-black text-2xl text-orange-600 tracking-widest">{svUssdCode}</p>
+              <p className="text-xs text-gray-400 mt-1">Composez ce code USSD sur votre téléphone</p>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-600">
+              Composez le code USSD de votre opérateur (ex&nbsp;: <span className="font-mono font-bold text-orange-600">*144#</span>) sur votre téléphone pour recevoir le code OTP par SMS.
+            </p>
+          )}
+          {svOtpMessage ? (
+            <p className="text-xs text-orange-700 mt-2 font-medium">{svOtpMessage}</p>
+          ) : null}
         </div>
 
-        <div>
-          <p className="text-sm font-semibold text-gray-800 mb-2">Code OTP</p>
+        {/* Step 2 — Enter OTP */}
+        <div className="rounded-2xl border-2 border-blue-100 bg-blue-50 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-full bg-[#003366] flex items-center justify-center flex-shrink-0">
+              <span className="text-white font-bold text-xs">2</span>
+            </div>
+            <p className="font-bold text-gray-900 text-sm">Entrez le code OTP reçu par SMS</p>
+          </div>
+          <p className="text-xs text-gray-500 mb-3">
+            Après avoir composé le code, vous recevrez un SMS avec un code OTP. Saisissez-le ci-dessous pour confirmer le paiement de <strong>{Number(amount).toLocaleString()} {currency}</strong>.
+          </p>
           <input
             type="text"
             inputMode="numeric"
             value={svOtp}
             onChange={(e) => setSvOtp(e.target.value)}
-            placeholder="Entrez votre code OTP"
-            className="w-full border border-gray-300 rounded-md px-4 py-4 text-sm text-gray-700 outline-none bg-white text-center text-xl tracking-widest font-bold"
+            placeholder="Code OTP reçu par SMS"
+            className="w-full border-2 border-gray-200 rounded-xl px-4 py-4 text-center text-2xl tracking-widest font-black text-gray-800 outline-none bg-white focus:border-blue-400"
             maxLength={8}
           />
         </div>

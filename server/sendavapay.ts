@@ -167,10 +167,11 @@ interface InitiatePaymentResponse {
   success: boolean;
   requiresOtp?: boolean;
   otpToken?: string;
+  ussdCode?: string;      // code à composer sur le téléphone pour recevoir l'OTP (ex: *144#)
   requiresRedirect?: boolean;
   redirectUrl?: string;
   reference?: string;
-  message?: string;
+  message?: string;       // instruction lisible retournée par l'API
   error?: string;
   code?: string;
 }
