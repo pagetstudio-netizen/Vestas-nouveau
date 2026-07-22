@@ -192,7 +192,7 @@ export default function HomePage() {
             { icon: iconRecharger, label: "Dépôt en ligne",   href: "/deposit",    mask: true },
             { icon: iconRetraits,  label: "Retrait en ligne", href: "/withdrawal", mask: true },
             { icon: iconService,   label: "Service client",   href: "/service",    mask: true },
-            { icon: iconGift,      label: "Code cadeau",      href: "/gift-code",  mask: false },
+            { icon: iconGift,      label: "Code cadeau",      href: "/gift-code",  mask: true  },
           ].map((item, i) => (
             <button
               key={i}
