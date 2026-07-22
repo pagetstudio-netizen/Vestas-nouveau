@@ -400,7 +400,7 @@ export default function MyProductsPage() {
               </button>
               <button
                 onClick={() => purchaseMutation.mutate(confirmProduct.id)}
-                disabled={purchaseMutation.isPending || balance < confirmProduct.price}
+                disabled={purchaseMutation.isPending}
                 className="flex-1 py-3 rounded-full text-white font-bold text-sm flex items-center justify-center gap-1 disabled:opacity-50"
                 style={{ background: "linear-gradient(135deg, #1E88E5, #004499)" }}
                 data-testid="button-confirm-purchase"
