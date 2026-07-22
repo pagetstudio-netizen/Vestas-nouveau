@@ -13,14 +13,14 @@ import serviceIcon from "@assets/20260311_214852_1773265973964.png";
 import btnOurProducts from "@assets/20260721_173328_1784656524037.png";
 import btnMyProduct from "@assets/20260721_173249_1784656523987.png";
 
-import productImg1 from "@assets/téléchargement_(16)_1784561452683.jpeg";
-import productImg2 from "@assets/téléchargement_(20)_1784561452229.jpeg";
-import productImg3 from "@assets/téléchargement_(19)_1784561452588.jpeg";
-import productImg4 from "@assets/images_(50)_1783210180466.jpeg";
-import productImg5 from "@assets/images_(41)_1783210181134.jpeg";
-import productImg6 from "@assets/images_(49)_1783210181155.jpeg";
-import productImg7 from "@assets/images_(40)_1783210181193.jpeg";
-import productImg8 from "@assets/images_(39)_1783210181215.jpeg";
+import productImg1 from "@assets/robot-humanoide_1784762709634.jpg";
+import productImg2 from "@assets/ROBOTIQUE-ET-IA_1784762709736.jpg";
+import productImg3 from "@assets/Liberer-le-potentiel-de-lintelligence-artificielle-dans-la-rob_1784762709762.png";
+import productImg4 from "@assets/roboter-pyhsikalische-ki-Xpert.Digital-png_1784762709783.png";
+import productImg5 from "@assets/71533_1784762709811.jpg";
+import productImg6 from "@assets/images_(30)_1784762709837.jpeg";
+import productImg7 from "@assets/images_(29)_1784762709868.jpeg";
+import productImg8 from "@assets/photo-1737644467636-6b0053476bb2_1784762709899.jpeg";
 
 const PRODUCT_IMAGES = [productImg1, productImg2, productImg3, productImg4, productImg5, productImg6, productImg7, productImg8];
 
