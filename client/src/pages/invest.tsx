@@ -191,64 +191,95 @@ export default function InvestPage() {
       </div>
 
       {/* ── Purchase confirm modal ── */}
-      {confirmProduct && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center px-6 bg-black/50"
-          onClick={() => setConfirmProduct(null)}
-        >
+      {confirmProduct && (() => {
+        const prodIdx   = (products?.findIndex(p => p.id === confirmProduct.id) ?? 0);
+        const prodImg   = PRODUCT_IMAGES[prodIdx % PRODUCT_IMAGES.length];
+        const shortage  = confirmProduct.price - balance;
+        const daily     = Number(confirmProduct.dailyIncome  || 0);
+        const total     = Number(confirmProduct.totalReturn  || daily * Number(confirmProduct.cycleDays || 90));
+        const duration  = Number(confirmProduct.cycleDays || 90);
+
+        return (
           <div
-            className="w-full max-w-xs rounded-2xl overflow-hidden shadow-2xl bg-white"
-            onClick={e => e.stopPropagation()}
+            className="fixed inset-0 z-50 flex items-center justify-center px-5 bg-black/60"
+            onClick={() => setConfirmProduct(null)}
           >
-            {/* Header */}
-            <div className="px-5 pt-5 pb-1 text-center">
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Conseil</p>
-              <p className="text-gray-800 font-semibold text-base leading-snug">
-                Êtes-vous sûr de vouloir acheter ce produit ?
-              </p>
-              <p className="text-gray-500 text-xs mt-2">
-                <span className="font-bold text-gray-700">{confirmProduct.name}</span>
-                {" · "}{currency} {Number(confirmProduct.price).toLocaleString("fr-FR")}
-              </p>
-              {balance < confirmProduct.price && (
-                <div className="flex items-center justify-center gap-1.5 mt-3 p-2 bg-amber-50 border border-amber-200 rounded-xl">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  <p className="text-xs text-amber-700">
-                    Solde insuffisant — manque {formatCurrency(confirmProduct.price - balance, user.country)}
+            <div
+              className="w-full max-w-xs rounded-3xl overflow-hidden shadow-2xl"
+              style={{ background: "linear-gradient(160deg, #1a6fd4 0%, #1255a8 100%)" }}
+              onClick={e => e.stopPropagation()}
+            >
+              {/* ── Title block ── */}
+              <div className="px-5 pt-6 pb-4">
+                <p className="text-white font-extrabold text-2xl leading-tight">
+                  {confirmProduct.name}
+                </p>
+                <p className="text-white/70 text-sm mt-2 leading-relaxed">
+                  Après l'achat du produit, vos gains seront crédités sur votre compte toutes les 24 heures.
+                </p>
+              </div>
+
+              {/* ── Details row ── */}
+              <div className="mx-5 mb-4 flex items-start gap-4">
+                {/* Product image */}
+                <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 border-2 border-white/20">
+                  <img src={prodImg} alt={confirmProduct.name} className="w-full h-full object-cover" />
+                </div>
+
+                {/* Info list */}
+                <div className="flex-1 space-y-2">
+                  {[
+                    { label: "Prix",              value: `${currency} ${Number(confirmProduct.price).toLocaleString("fr-FR")}` },
+                    { label: "Revenu quotidien",  value: `${currency} ${daily.toLocaleString("fr-FR")}` },
+                    { label: "Revenu total",      value: `${currency} ${total.toLocaleString("fr-FR")}` },
+                    { label: "Période de validité", value: `${duration} jours` },
+                  ].map(row => (
+                    <div key={row.label}>
+                      <p className="text-white/60 text-[10px] leading-none">{row.label}</p>
+                      <p className="text-white font-bold text-[13px] leading-tight">{row.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── Insufficient balance warning ── */}
+              {shortage > 0 && (
+                <div className="mx-5 mb-4 flex items-center gap-2 px-3 py-2.5 rounded-xl"
+                  style={{ background: "rgba(220,50,50,0.22)", border: "1px solid rgba(255,100,100,0.35)" }}>
+                  <AlertTriangle className="w-4 h-4 text-red-300 shrink-0" />
+                  <p className="text-red-200 text-xs leading-snug">
+                    Solde insuffisant. Il vous manque {currency} {shortage.toLocaleString("fr-FR")}.
                   </p>
                 </div>
               )}
-            </div>
 
-            {/* Divider */}
-            <div className="h-px bg-gray-100 mt-5" />
-
-            {/* Buttons */}
-            <div className="flex">
-              <button
-                onClick={() => setConfirmProduct(null)}
-                className="flex-1 py-4 font-semibold text-base text-gray-500 active:bg-gray-50 transition-colors"
-                style={{ borderRight: "1px solid #f0f0f0" }}
-                data-testid="button-cancel-purchase"
-              >
-                Non
-              </button>
-              <button
-                onClick={() => purchaseMutation.mutate(confirmProduct.id)}
-                disabled={purchaseMutation.isPending}
-                className="flex-1 py-4 font-bold text-base text-white flex items-center justify-center gap-1.5 active:opacity-90 transition-opacity"
-                style={{ background: "#22c55e" }}
-                data-testid="button-confirm-purchase"
-              >
-                {purchaseMutation.isPending
-                  ? <Loader2 className="w-4 h-4 animate-spin" />
-                  : "Oui"
-                }
-              </button>
+              {/* ── Buttons ── */}
+              <div className="flex gap-3 px-5 pb-6">
+                <button
+                  onClick={() => setConfirmProduct(null)}
+                  className="flex-1 py-3 rounded-2xl font-semibold text-white/80 text-sm active:opacity-70 transition-opacity"
+                  style={{ background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.25)" }}
+                  data-testid="button-cancel-purchase"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={() => purchaseMutation.mutate(confirmProduct.id)}
+                  disabled={purchaseMutation.isPending}
+                  className="flex-1 py-3 rounded-2xl font-bold text-white/90 text-sm flex items-center justify-center gap-1.5 active:opacity-70 transition-opacity"
+                  style={{ background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.25)" }}
+                  data-testid="button-confirm-purchase"
+                >
+                  {purchaseMutation.isPending
+                    ? <Loader2 className="w-4 h-4 animate-spin" />
+                    : "Confirmer"
+                  }
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
