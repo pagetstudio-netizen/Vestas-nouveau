@@ -232,10 +232,16 @@ export default function DepositPage() {
       return initRes.json();
     },
     onSuccess: (data: any) => {
-      if (data.requiresRedirect && data.redirectUrl) {
-        // Wave and some other operators require opening an external URL
+      const isWave = svOperator?.name?.toLowerCase().includes("wave");
+      if (data.requiresRedirect && data.redirectUrl && isWave) {
+        // Seul Wave nécessite une redirection vers une page externe
         setSvRedirectUrl(data.redirectUrl);
         setStep("sv-redirect");
+      } else if (data.requiresRedirect && !isWave) {
+        // Les autres opérateurs (MTN, Moov, etc.) envoient un push USSD directement
+        // sur le téléphone — pas besoin de redirection, on attend juste le webhook
+        setSvPolling(true);
+        setStep("sv-waiting");
       } else if (data.requiresOtp && data.otpToken) {
         // Orange Money (BF, CI, GN, ML, SN) — user must dial USSD then enter OTP
         setSvOtpToken(data.otpToken);
