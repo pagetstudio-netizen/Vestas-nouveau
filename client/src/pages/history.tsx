@@ -7,8 +7,6 @@ import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
 import nodataImg from "@assets/nodata-da225bbb_(1)_1783249133513.png";
-import iconRecharger from "@assets/1-1_1783245823715.png";
-import iconRetraits from "@assets/2-1_1783245823825.png";
 
 interface Deposit {
   id: number;
@@ -21,6 +19,7 @@ interface Deposit {
   soleaspayOrderId?: string;
   omnipayId?: string;
   omnipayReference?: string;
+  sendavapayReference?: string;
 }
 
 interface Withdrawal {
@@ -30,9 +29,61 @@ interface Withdrawal {
   netAmount: string;
   status: string;
   createdAt: string;
+  sendavapayReference?: string;
 }
 
 const BG = "linear-gradient(160deg, #1565C0 0%, #1976D2 70%, #1E88E5 100%)";
+
+/* Generate a reference starting with "sdk" */
+const makeRef = (prefix: "D" | "W", id: number, date: string) => {
+  const d = new Date(date);
+  const yy  = String(d.getFullYear()).slice(2);
+  const mm  = String(d.getMonth() + 1).padStart(2, "0");
+  const dd  = String(d.getDate()).padStart(2, "0");
+  const hh  = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  const seq = String(id).padStart(4, "0");
+  return `sdk${yy}${mm}${dd}${hh}${min}${prefix}${seq}`;
+};
+
+const getDepositRef = (d: Deposit) => {
+  if (d.sendavapayReference) return d.sendavapayReference.startsWith("sdk") ? d.sendavapayReference : `sdk${d.sendavapayReference}`;
+  if (d.omnipayReference)    return d.omnipayReference.startsWith("sdk")    ? d.omnipayReference    : `sdk${d.omnipayReference}`;
+  if (d.omnipayId)           return `sdk${d.omnipayId}`;
+  if (d.soleaspayReference)  return d.soleaspayReference.startsWith("sdk")  ? d.soleaspayReference  : `sdk${d.soleaspayReference}`;
+  if (d.soleaspayOrderId)    return `sdk${d.soleaspayOrderId}`;
+  return makeRef("D", d.id, d.createdAt);
+};
+
+const getWithdrawalRef = (w: Withdrawal) => {
+  if (w.sendavapayReference) return w.sendavapayReference.startsWith("sdk") ? w.sendavapayReference : `sdk${w.sendavapayReference}`;
+  return makeRef("W", w.id, w.createdAt);
+};
+
+const formatDate = (dateString: string) => {
+  const d = new Date(dateString);
+  const mm  = String(d.getMonth() + 1).padStart(2, "0");
+  const dd  = String(d.getDate()).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  const hh  = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  const ss  = String(d.getSeconds()).padStart(2, "0");
+  return `${mm}/${dd}/${yyyy} ${hh}:${min}:${ss}`;
+};
+
+const getStatusInfo = (status: string) => {
+  switch (status) {
+    case "completed":
+    case "approved":
+      return { label: "Réussi",      bg: "#16a34a" };
+    case "rejected":
+      return { label: "Échoué",      bg: "#dc2626" };
+    case "processing":
+      return { label: "En traitement", bg: "#d97706" };
+    default:
+      return { label: "En attente",  bg: "#d97706" };
+  }
+};
 
 export default function HistoryPage() {
   const { user, refreshUser } = useAuth();
@@ -52,56 +103,9 @@ export default function HistoryPage() {
     queryKey: ["/api/withdrawals/history"],
   });
 
-  const getStatusLabel = (status: string, type: "deposit" | "withdrawal") => {
-    switch (status) {
-      case "completed":
-      case "approved":
-        return type === "deposit" ? "Succès du dépôt" : "Succès du retrait";
-      case "rejected":
-        return "Échec";
-      case "processing":
-        return "En traitement";
-      case "pending":
-        return "En attente";
-      default:
-        return status;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-      case "approved":
-        return "#00BCD4";
-      case "rejected":
-        return "#EF4444";
-      default:
-        return "#F59E0B";
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    const h = String(date.getHours()).padStart(2, "0");
-    const min = String(date.getMinutes()).padStart(2, "0");
-    const s = String(date.getSeconds()).padStart(2, "0");
-    return `${y}-${m}-${d} ${h}:${min}:${s}`;
-  };
-
-  const getReference = (deposit: Deposit) => {
-    if (deposit.omnipayReference) return deposit.omnipayReference;
-    if (deposit.omnipayId) return deposit.omnipayId;
-    if (deposit.soleaspayReference) return deposit.soleaspayReference;
-    if (deposit.soleaspayOrderId) return deposit.soleaspayOrderId;
-    return `DEP${deposit.id.toString().padStart(10, "0")}`;
-  };
-
   const isPendingDeposit = (deposit: Deposit) =>
     (deposit.status === "pending" || deposit.status === "processing") &&
-    (deposit.soleaspayReference || deposit.soleaspayOrderId || deposit.omnipayId || deposit.omnipayReference);
+    (deposit.soleaspayReference || deposit.soleaspayOrderId || deposit.omnipayId || deposit.omnipayReference || deposit.sendavapayReference);
 
   const handleVerify = async (depositId: number) => {
     setVerifyingId(depositId);
@@ -143,135 +147,179 @@ export default function HistoryPage() {
             <ChevronLeft className="w-5 h-5 text-white" />
           </button>
         </Link>
-        <p className="flex-1 text-center text-white font-extrabold text-lg pr-9">Détails</p>
+        <p className="flex-1 text-center text-white font-extrabold text-lg pr-9">Historique</p>
       </div>
 
-      {/* ── Tabs ── */}
-      <div className="flex items-end px-8 gap-6 mb-4">
+      {/* ── Tabs — gauche / droite bord écran ── */}
+      <div className="flex mb-4">
         <button
           onClick={() => setActiveTab("deposits")}
-          className="pb-2 font-semibold text-base transition-all"
+          className="flex-1 py-3 font-bold text-base transition-all"
           style={{
-            color: activeTab === "deposits" ? "#fff" : "rgba(255,255,255,0.55)",
+            color: activeTab === "deposits" ? "#fff" : "rgba(255,255,255,0.5)",
             borderBottom: activeTab === "deposits" ? "3px solid #fff" : "3px solid transparent",
           }}
           data-testid="tab-deposits"
         >
-          Recharger
+          Dépôt
         </button>
         <button
           onClick={() => setActiveTab("withdrawals")}
-          className="pb-2 font-semibold text-base transition-all"
+          className="flex-1 py-3 font-bold text-base transition-all"
           style={{
-            color: activeTab === "withdrawals" ? "#fff" : "rgba(255,255,255,0.55)",
+            color: activeTab === "withdrawals" ? "#fff" : "rgba(255,255,255,0.5)",
             borderBottom: activeTab === "withdrawals" ? "3px solid #fff" : "3px solid transparent",
           }}
           data-testid="tab-withdrawals"
         >
-          Retirer
+          Retrait
         </button>
       </div>
 
       {/* ── Content ── */}
-      <div className="flex-1 overflow-y-auto px-4 pb-8 space-y-3">
+      <div className="flex-1 overflow-y-auto px-3 pb-8 space-y-3">
 
         {isLoading ? (
           <div className="flex justify-center py-16">
             <Loader2 className="w-8 h-8 animate-spin text-white" />
           </div>
+
         ) : (activeTab === "deposits" ? deposits : withdrawals).length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <img src={nodataImg} alt="Aucune donnée" className="w-28 h-28 object-contain opacity-90" />
             <p className="text-white/70 text-sm">Aucune transaction pour le moment</p>
           </div>
+
         ) : activeTab === "deposits" ? (
           deposits.map((deposit) => {
-            const statusColor = getStatusColor(deposit.status);
+            const { label: statusLabel, bg: statusBg } = getStatusInfo(deposit.status);
+            const ref = getDepositRef(deposit);
+            const amt = parseFloat(deposit.amount);
             return (
               <div
                 key={deposit.id}
-                className="bg-white rounded-2xl shadow-sm px-4 py-3.5"
+                className="rounded-2xl overflow-hidden shadow-lg"
+                style={{ background: "#1a1f2e" }}
                 data-testid={`deposit-item-${deposit.id}`}
               >
-                <div className="flex items-center gap-3">
-                  {/* Icon */}
-                  <div
-                    className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-                    style={{ background: "linear-gradient(135deg, #DBEAFE, #BFDBFE)" }}
-                  >
-                    <img src={iconRecharger} alt="" className="w-6 h-6 object-contain"
-                      style={{ filter: "brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1200%) hue-rotate(188deg) brightness(95%)" }}
-                    />
-                  </div>
+                {/* Colored header row */}
+                <div
+                  className="flex items-center justify-between px-4 py-3"
+                  style={{ background: "linear-gradient(90deg, #5c35c8, #3b1fa8)" }}
+                >
+                  <span className="text-white font-bold text-base">Dépôt</span>
+                  <span className="text-white font-bold text-base">
+                    {currency} {amt.toLocaleString("fr-FR")}
+                  </span>
+                </div>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-gray-800 font-bold text-sm">Recharger</p>
-                    <p className="text-xs mt-0.5" style={{ color: statusColor }}>
-                      {getStatusLabel(deposit.status, "deposit")}
-                    </p>
-                    <p className="text-gray-400 text-xs mt-0.5">{formatDate(deposit.createdAt)}</p>
+                {/* Body rows */}
+                <div className="px-4 py-3 space-y-2.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 text-sm">N° de commande :</span>
+                    <span className="text-white text-sm font-medium text-right ml-2 break-all">{ref}</span>
                   </div>
-
-                  {/* Amount */}
-                  <div className="text-right shrink-0">
-                    <p className="font-bold text-sm" style={{ color: statusColor }}>
-                      +{parseFloat(deposit.amount).toLocaleString()}{currency}
-                    </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 text-sm">Montant de la commande :</span>
+                    <span className="text-white text-sm font-medium">
+                      {currency} {amt.toLocaleString("fr-FR")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 text-sm">Montant reçu :</span>
+                    <span className="text-white text-sm font-medium">
+                      {currency} {amt.toLocaleString("fr-FR")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 text-sm">Heure :</span>
+                    <span className="text-white text-sm font-medium">{formatDate(deposit.createdAt)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 text-sm">Statut :</span>
+                    <span
+                      className="text-white text-xs font-bold px-4 py-1 rounded-lg"
+                      style={{ background: statusBg }}
+                    >
+                      {statusLabel}
+                    </span>
                   </div>
                 </div>
 
                 {isPendingDeposit(deposit) && (
-                  <button
-                    onClick={() => handleVerify(deposit.id)}
-                    disabled={verifyingId === deposit.id}
-                    className="mt-3 w-full py-2 text-white text-xs font-bold rounded-full flex items-center justify-center gap-2 disabled:opacity-50"
-                    style={{ background: "#1976D2" }}
-                    data-testid={`button-verify-${deposit.id}`}
-                  >
-                    {verifyingId === deposit.id
-                      ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      : <RefreshCw className="w-3.5 h-3.5" />}
-                    Vérifier la transaction
-                  </button>
+                  <div className="px-4 pb-3">
+                    <button
+                      onClick={() => handleVerify(deposit.id)}
+                      disabled={verifyingId === deposit.id}
+                      className="w-full py-2 text-white text-xs font-bold rounded-full flex items-center justify-center gap-2 disabled:opacity-50"
+                      style={{ background: "#1976D2" }}
+                      data-testid={`button-verify-${deposit.id}`}
+                    >
+                      {verifyingId === deposit.id
+                        ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        : <RefreshCw className="w-3.5 h-3.5" />}
+                      Vérifier la transaction
+                    </button>
+                  </div>
                 )}
               </div>
             );
           })
+
         ) : (
           withdrawals.map((withdrawal) => {
-            const statusColor = getStatusColor(withdrawal.status);
+            const { label: statusLabel, bg: statusBg } = getStatusInfo(withdrawal.status);
+            const ref = getWithdrawalRef(withdrawal);
+            const gross = parseFloat(withdrawal.amount);
+            const net   = parseFloat(withdrawal.netAmount || withdrawal.amount);
             return (
               <div
                 key={withdrawal.id}
-                className="bg-white rounded-2xl shadow-sm px-4 py-3.5"
+                className="rounded-2xl overflow-hidden shadow-lg"
+                style={{ background: "#1a1f2e" }}
                 data-testid={`withdrawal-item-${withdrawal.id}`}
               >
-                <div className="flex items-center gap-3">
-                  {/* Icon */}
-                  <div
-                    className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-                    style={{ background: "linear-gradient(135deg, #DBEAFE, #BFDBFE)" }}
-                  >
-                    <img src={iconRetraits} alt="" className="w-6 h-6 object-contain"
-                      style={{ filter: "brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1200%) hue-rotate(188deg) brightness(95%)" }}
-                    />
-                  </div>
+                {/* Colored header row */}
+                <div
+                  className="flex items-center justify-between px-4 py-3"
+                  style={{ background: "linear-gradient(90deg, #5c35c8, #3b1fa8)" }}
+                >
+                  <span className="text-white font-bold text-base">Retrait</span>
+                  <span className="text-white font-bold text-base">
+                    {currency} {gross.toLocaleString("fr-FR")}
+                  </span>
+                </div>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-gray-800 font-bold text-sm">Retirer</p>
-                    <p className="text-xs mt-0.5" style={{ color: statusColor }}>
-                      {getStatusLabel(withdrawal.status, "withdrawal")}
-                    </p>
-                    <p className="text-gray-400 text-xs mt-0.5">{formatDate(withdrawal.createdAt)}</p>
+                {/* Body rows */}
+                <div className="px-4 py-3 space-y-2.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 text-sm">N° de commande :</span>
+                    <span className="text-white text-sm font-medium text-right ml-2 break-all">{ref}</span>
                   </div>
-
-                  {/* Amount */}
-                  <div className="text-right shrink-0">
-                    <p className="font-bold text-sm" style={{ color: statusColor }}>
-                      -{parseFloat(withdrawal.amount).toLocaleString()}{currency}
-                    </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 text-sm">Montant de la commande :</span>
+                    <span className="text-white text-sm font-medium">
+                      {currency} {gross.toLocaleString("fr-FR")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 text-sm">Montant reçu :</span>
+                    <span className="text-white text-sm font-medium">
+                      {currency} {net.toLocaleString("fr-FR")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 text-sm">Heure :</span>
+                    <span className="text-white text-sm font-medium">{formatDate(withdrawal.createdAt)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 text-sm">Statut :</span>
+                    <span
+                      className="text-white text-xs font-bold px-4 py-1 rounded-lg"
+                      style={{ background: statusBg }}
+                    >
+                      {statusLabel}
+                    </span>
                   </div>
                 </div>
               </div>
