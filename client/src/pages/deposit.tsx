@@ -5,7 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
   ChevronLeft, Info, Copy, CheckCircle, Upload, Phone, Loader2,
-  ImageIcon, ArrowRight, Zap, RefreshCw, ExternalLink,
+  ImageIcon, ArrowRight, Zap, RefreshCw,
 } from "lucide-react";
 import { Link } from "wouter";
 import { COUNTRIES, type ApiCountry } from "@/lib/countries";
@@ -17,8 +17,7 @@ type Step =
   | "form"
   | "sv-operator"
   | "sv-waiting"
-  | "sv-otp"
-  | "sv-redirect";
+  | "sv-otp";
 
 interface SvOperator {
   id: string;
@@ -51,7 +50,6 @@ export default function DepositPage() {
   const [svPaymentToken, setSvPaymentToken] = useState<string>("");
   const [svOtpToken, setSvOtpToken] = useState<string>("");
   const [svOtp, setSvOtp] = useState<string>("");
-  const [svRedirectUrl, setSvRedirectUrl] = useState<string>("");
   const [svStatus, setSvStatus] = useState<string>("");
   const [svPolling, setSvPolling] = useState(false);
 
@@ -227,17 +225,15 @@ export default function DepositPage() {
       return initRes.json();
     },
     onSuccess: (data: any) => {
-      if (data.requiresRedirect && data.redirectUrl) {
-        setSvRedirectUrl(data.redirectUrl);
-        setStep("sv-redirect");
-      } else if (data.requiresOtp && data.otpToken) {
+      if (data.requiresOtp && data.otpToken) {
         setSvOtpToken(data.otpToken);
         setStep("sv-otp");
       } else if (data.success) {
+        // Push sent to user's phone — wait for confirmation
         setSvPolling(true);
         setStep("sv-waiting");
       } else {
-        toast({ title: "Erreur", description: data.message || "Erreur paiement", variant: "destructive" });
+        toast({ title: "Erreur", description: data.error || data.message || "Erreur paiement", variant: "destructive" });
       }
     },
     onError: (e: any) => toast({ title: "Erreur", description: e.message, variant: "destructive" }),
@@ -704,38 +700,6 @@ export default function DepositPage() {
     </div>
   );
 
-  // ── SENDAVAPAY: Redirect screen (Wave etc.) ────────────────────────────────
-  if (step === "sv-redirect") return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <header className="flex items-center gap-2 px-4 py-4 bg-white border-b border-gray-100">
-        <button onClick={() => setStep("sv-operator")} className="flex items-center gap-1 text-gray-800">
-          <ChevronLeft className="w-5 h-5" />
-          <span className="font-semibold text-base">Finaliser le paiement</span>
-        </button>
-      </header>
-
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-6">
-        <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
-          <ExternalLink className="w-10 h-10 text-blue-500" />
-        </div>
-        <div>
-          <p className="font-bold text-gray-900 text-xl mb-2">Finaliser sur l'application</p>
-          <p className="text-sm text-gray-500">Vous allez être redirigé vers la page de paiement de l'opérateur pour confirmer votre dépôt de <strong>{Number(amount).toLocaleString()} {currency}</strong></p>
-        </div>
-        <a
-          href={svRedirectUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full py-5 rounded-full text-white font-bold text-base shadow-lg flex items-center justify-center gap-2"
-          style={{ background: "linear-gradient(135deg, #1565C0 0%, #0D47A1 50%, #0a2e6e 100%)" }}
-          onClick={() => { setSvPolling(true); setStep("sv-waiting"); }}
-        >
-          <ExternalLink className="w-5 h-5" /> Ouvrir la page de paiement
-        </a>
-      </div>
-    </div>
-  );
-
   // ── SENDAVAPAY: Waiting / polling screen ────────────────────────────────────
   if (step === "sv-waiting") return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -762,8 +726,8 @@ export default function DepositPage() {
             <div>
               <p className="font-bold text-gray-900 text-xl">En attente de confirmation</p>
               <p className="text-sm text-gray-500 mt-2">
-                Confirmez le paiement de <strong>{Number(amount).toLocaleString()} {currency}</strong> sur votre téléphone.<br />
-                Cette page se met à jour automatiquement.
+                Une demande de paiement de <strong>{Number(amount).toLocaleString()} {currency}</strong> a été envoyée sur votre téléphone.<br />
+                Acceptez-la sur votre téléphone. Cette page se met à jour automatiquement.
               </p>
             </div>
             <div className="flex gap-3 w-full">

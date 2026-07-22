@@ -158,15 +158,17 @@ export function mapSendavapayStatus(
 
 // ── Client/CORS API proxies (called from our backend on behalf of frontend) ─
 
+// Pure-push SDK: no redirect, no widget, no iframe.
+// After initiate-payment the operator pushes a USSD/confirmation to the user's phone.
+// The only two paths are: requiresOtp=true (user enters code) or success (wait for webhook).
 interface InitiatePaymentResponse {
   success: boolean;
   requiresOtp?: boolean;
   otpToken?: string;
-  requiresRedirect?: boolean;
-  redirectUrl?: string;
   reference?: string;
   message?: string;
   error?: string;
+  code?: string;
 }
 
 export async function initiatePayment(params: {
@@ -188,7 +190,10 @@ export async function initiatePayment(params: {
 
   const response = await fetch(`${SENDAVAPAY_API_BASE}/initiate-payment`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      Authorization: `Bearer ${getApiKey()}`,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(body),
   });
 
@@ -208,7 +213,10 @@ export async function submitOtp(params: {
 }): Promise<SubmitOtpResponse> {
   const response = await fetch(`${SENDAVAPAY_API_BASE}/submit-otp`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      Authorization: `Bearer ${getApiKey()}`,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ otpToken: params.otpToken, otp: params.otp }),
   });
 
