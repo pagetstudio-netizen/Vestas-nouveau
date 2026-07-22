@@ -71,7 +71,7 @@ export default function AccountPage() {
     { icon: iconWallet,    label: "Ma carte bancaire",       href: "/wallet",          isLogo: false },
     { icon: iconChangePwd, label: "Sécurité",               href: "/change-password", isLogo: false },
     { icon: iconAbout,     label: "À propos de nous",        href: "/about",           isLogo: false },
-    { icon: iconRecords,   label: "Règles de la plateforme", href: "/rules",           isLogo: false },
+
     { icon: iconCS,        label: "Service client",          href: "/service",         isLogo: false },
   ];
 
