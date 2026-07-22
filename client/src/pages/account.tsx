@@ -17,7 +17,7 @@ import iconRecords  from "@assets/mine-mod-records-DgHXSKa1_1782689837747.png";
 import iconAbout    from "@assets/mine-mod-aboutus-xnaBhqOq_1782689895455.png";
 import iconCS       from "@assets/mine-mod-cs-DtBQ0Sp0_1782689895410.png";
 import iconChangePwd from "@assets/mine-mod-change-pwd-D4tL_Aft_1782689895436.png";
-import iconWallet   from "@assets/portefeuille-chaud-3d-icon-png-download-9878550_1783248791774.png";
+import iconWallet   from "@assets/mine-mod-bankcard-CLOhqwHj_1784762822542.png";
 import iconSalaire  from "@assets/téléchargement_(63)_1783248791872.png";
 import iconRecharger from "@assets/1-1_1783245823715.png";
 import iconRetraits  from "@assets/2-1_1783245823825.png";
