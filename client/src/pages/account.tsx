@@ -12,26 +12,23 @@ import { useToast } from "@/hooks/use-toast";
 
 import robotImg      from "@assets/ai-robot-typing-on-ipad-isolated-on-transparent-background-fre_1784755325508.png";
 import doosanLogo    from "@assets/channels4_profile_1784755325592.jpg";
-import iconBell      from "@assets/d68b81d4-3a8a-4ba0-804f-d77f381cb5ab_1784755516755.png";
-import iconGiftNew   from "@assets/0dbab192-27c3-4e50-8c09-17603ef394d1_1784755516794.png";
-import bgMachinery   from "@assets/téléchargement_(20)_1784755537225.jpeg";
-import bgCorporate   from "@assets/téléchargement_(15)_1784755566226.jpeg";
+import iconBell      from "@assets/d68b81d4-3a8a-4ba0-804f-d77f381cb5ab_1784756176031.png";
+import iconGiftNew   from "@assets/0dbab192-27c3-4e50-8c09-17603ef394d1_1784756176118.png";
+import bgDoosan      from "@assets/téléchargement_(18)_1784756176152.jpeg";
+import bgConference  from "@assets/téléchargement_(15)_1784756176133.jpeg";
 
 import iconRecords    from "@assets/mine-mod-records-DgHXSKa1_1782689837747.png";
-import iconGift       from "@assets/téléchargement_(66)_1782689859239.png";
 import iconAbout      from "@assets/mine-mod-aboutus-xnaBhqOq_1782689895455.png";
 import iconCS         from "@assets/mine-mod-cs-DtBQ0Sp0_1782689895410.png";
-import iconWithdraw   from "@assets/withdraw-icon-DFsum39V_(1)_1782689895379.png";
 import iconChangePwd  from "@assets/mine-mod-change-pwd-D4tL_Aft_1782689895436.png";
 import iconWallet     from "@assets/portefeuille-chaud-3d-icon-png-download-9878550_1783248791774.png";
-import iconRevenu     from "@assets/3309927_1783248791847.png";
 import iconSalaire    from "@assets/téléchargement_(63)_1783248791872.png";
 import iconRecharger  from "@assets/1-1_1783245823715.png";
 import iconRetraits   from "@assets/2-1_1783245823825.png";
 
 const WHITE      = "brightness(0) invert(1)";
 const BLUE_ICO   = "brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(900%) hue-rotate(188deg)";
-/* Bell : gold/amber to stand out on dark background */
+/* Bell : gold/amber to stand out */
 const BELL_COLOR = "brightness(0) saturate(100%) invert(78%) sepia(80%) saturate(600%) hue-rotate(5deg) brightness(105%)";
 
 export default function AccountPage() {
@@ -84,7 +81,6 @@ export default function AccountPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-black">
-      {/* Keyframe for marquee — injected inline so no extra CSS file needed */}
       <style>{`
         @keyframes marquee {
           0%   { transform: translateX(100%); }
@@ -95,43 +91,37 @@ export default function AccountPage() {
 
       <div className="flex-1 overflow-y-auto pb-24">
 
-        {/* ═══ HERO — black section ═══ */}
-        <div className="relative overflow-hidden" style={{ background: "#0a0a0a", minHeight: 270 }}>
+        {/* ═══ HERO — full-width photo ═══ */}
+        <div className="relative w-full overflow-hidden" style={{ height: 220 }}>
           <img
-            src={robotImg}
-            alt="robot"
-            className="absolute bottom-0 right-0 pointer-events-none select-none"
-            style={{ height: 245, width: "auto", objectFit: "contain", opacity: 0.92 }}
+            src={bgDoosan}
+            alt="Doosan Robotics"
+            className="absolute inset-0 w-full h-full object-cover object-center"
           />
+          {/* bottom-to-top fade so action row transitions smoothly */}
           <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: "linear-gradient(90deg, #0a0a0a 52%, transparent 100%)" }}
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.62) 100%)" }}
           />
-          <div className="relative z-10 px-5 pt-6">
-            {/* Top row */}
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-white font-extrabold text-2xl tracking-wide">Le mien</p>
-              <img src={iconSalaire} alt="" className="w-7 h-7 object-contain" style={{ filter: WHITE }} />
-            </div>
-            {/* Profile row */}
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/30 shrink-0 bg-[#1565C0]">
+          {/* Profile overlay at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/40 shrink-0 bg-[#1565C0]">
                 <img src={doosanLogo} alt="Doosan" className="w-full h-full object-cover" />
               </div>
               <div>
-                <p className="text-white font-bold text-lg leading-tight tracking-wide">
+                <p className="text-white font-bold text-base leading-tight drop-shadow">
                   {phonePrefix} {user.phone}
                 </p>
-                <p className="text-white/50 text-xs mt-0.5">ID : {user.referralCode}</p>
+                <p className="text-white/70 text-[11px] drop-shadow">ID : {user.referralCode}</p>
               </div>
             </div>
-            {/* Balance headline */}
-            <div className="mb-4">
-              <p className="text-white font-extrabold text-3xl leading-none" data-testid="text-balance">
-                {currency} {balance.toFixed(2)}
-              </p>
-              <p className="text-white/50 text-sm mt-1">Solde du compte</p>
-            </div>
+            <img
+              src={iconSalaire}
+              alt=""
+              className="w-6 h-6 object-contain"
+              style={{ filter: WHITE, opacity: 0.8 }}
+            />
           </div>
         </div>
 
@@ -141,10 +131,10 @@ export default function AccountPage() {
           style={{ background: "#111", border: "1px solid #222" }}
         >
           {[
-            { icon: iconRecharger, label: "Recharger",      href: "/deposit"    },
-            { icon: iconRetraits,  label: "Retirer",        href: "/withdrawal" },
-            { icon: iconRecords,   label: "Registres",      href: "/history"    },
-            { icon: iconGiftNew,   label: "Code cadeau",    href: "/gift-code", raw: true },
+            { icon: iconRecharger, label: "Recharger",   href: "/deposit",    raw: false },
+            { icon: iconRetraits,  label: "Retirer",     href: "/withdrawal", raw: false },
+            { icon: iconRecords,   label: "Registres",   href: "/history",    raw: false },
+            { icon: iconGiftNew,   label: "Code cadeau", href: "/gift-code",  raw: true  },
           ].map((item, i) => (
             <Link href={item.href} key={i}>
               <button className="flex flex-col items-center justify-center gap-2 py-4 w-full active:bg-white/5 rounded-2xl">
@@ -154,7 +144,9 @@ export default function AccountPage() {
                   className="w-8 h-8 object-contain"
                   style={item.raw ? {} : { filter: WHITE }}
                 />
-                <span className="text-white/80 text-[10px] font-medium text-center leading-tight px-0.5">{item.label}</span>
+                <span className="text-white/80 text-[10px] font-medium text-center leading-tight px-0.5">
+                  {item.label}
+                </span>
               </button>
             </Link>
           ))}
@@ -178,24 +170,23 @@ export default function AccountPage() {
           </div>
         </div>
 
-        {/* ═══ Large balance cards with background images ═══ */}
+        {/* ═══ Stat cards with background images — BIGGER ═══ */}
         <div className="mx-4 mt-3 grid grid-cols-2 gap-3">
 
-          {/* Card 1 — Solde (machinery background, large) */}
+          {/* Card 1 — Balance (tall, Doosan Robotics bg) */}
           <div
-            className="rounded-2xl overflow-hidden relative col-span-1"
-            style={{ height: 170 }}
+            className="rounded-2xl overflow-hidden relative"
+            style={{ height: 210 }}
           >
-            <img src={bgMachinery} alt="" className="absolute inset-0 w-full h-full object-cover" />
-            {/* Dark overlay */}
+            <img src={bgDoosan} alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
             <div
               className="absolute inset-0"
-              style={{ background: "linear-gradient(160deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 100%)" }}
+              style={{ background: "linear-gradient(160deg, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.38) 100%)" }}
             />
             <div className="relative z-10 p-4 flex flex-col justify-between h-full">
-              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide">Balance</p>
+              <p className="text-white/80 text-xs font-bold uppercase tracking-wider">Balance</p>
               <div>
-                <p className="text-white font-extrabold text-xl leading-tight" data-testid="text-balance-card">
+                <p className="text-white font-extrabold text-2xl leading-tight" data-testid="text-balance-card">
                   {balance.toFixed(2)}
                 </p>
                 <p className="text-white/70 text-[11px] mt-0.5">{currency}</p>
@@ -206,41 +197,44 @@ export default function AccountPage() {
           {/* Right column — 2 stacked cards */}
           <div className="flex flex-col gap-3">
 
-            {/* Card 2 — Revenus cumulatifs (corporate background) */}
+            {/* Card 2 — Cumulatif (conference bg) */}
             <div
               className="rounded-2xl overflow-hidden relative"
-              style={{ height: 80 }}
+              style={{ height: 100 }}
             >
-              <img src={bgCorporate} alt="" className="absolute inset-0 w-full h-full object-cover object-top" />
+              <img src={bgConference} alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
               <div
                 className="absolute inset-0"
-                style={{ background: "rgba(0,0,0,0.55)" }}
+                style={{ background: "rgba(0,0,0,0.58)" }}
               />
               <div className="relative z-10 p-3 flex flex-col justify-between h-full">
-                <p className="text-white/80 text-[10px] font-semibold uppercase tracking-wide">Cumulatif</p>
-                <p className="text-white font-extrabold text-base leading-none" data-testid="text-earnings-card">
-                  {totalEarnings.toFixed(2)} <span className="text-[10px] font-normal text-white/70">{currency}</span>
+                <p className="text-white/80 text-[10px] font-bold uppercase tracking-wider">Cumulatif</p>
+                <p className="text-white font-extrabold text-lg leading-none" data-testid="text-earnings-card">
+                  {totalEarnings.toFixed(2)}
+                  <span className="text-[10px] font-normal text-white/70 ml-1">{currency}</span>
                 </p>
               </div>
             </div>
 
-            {/* Card 3 — Produits actifs (dark solid) */}
+            {/* Card 3 — Produits actifs (Doosan blue gradient) */}
             <div
               className="rounded-2xl overflow-hidden relative"
-              style={{ height: 80, background: "linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)" }}
+              style={{ height: 100, background: "linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)" }}
             >
-              <div className="absolute inset-0 opacity-10"
-                style={{ backgroundImage: "radial-gradient(circle at 70% 30%, #fff 0%, transparent 60%)" }} />
+              <div
+                className="absolute inset-0 opacity-15"
+                style={{ backgroundImage: "radial-gradient(circle at 75% 25%, #fff 0%, transparent 60%)" }}
+              />
               <div className="relative z-10 p-3 flex flex-col justify-between h-full">
-                <p className="text-white/80 text-[10px] font-semibold uppercase tracking-wide">Produits actifs</p>
-                <p className="text-white font-extrabold text-2xl leading-none">{activeProducts}</p>
+                <p className="text-white/80 text-[10px] font-bold uppercase tracking-wider">Produits actifs</p>
+                <p className="text-white font-extrabold text-3xl leading-none">{activeProducts}</p>
               </div>
             </div>
 
           </div>
         </div>
 
-        {/* ═══ "Mon appareil" banner card ═══ */}
+        {/* ═══ "Mon appareil" banner ═══ */}
         <div className="px-4 mt-3">
           <button
             onClick={() => navigate("/invest")}
@@ -278,8 +272,12 @@ export default function AccountPage() {
                     </div>
                   ) : (
                     <div className="w-9 h-9 flex items-center justify-center shrink-0">
-                      <img src={item.icon} alt={item.label} className="w-7 h-7 object-contain"
-                        style={{ filter: BLUE_ICO }} />
+                      <img
+                        src={item.icon}
+                        alt={item.label}
+                        className="w-7 h-7 object-contain"
+                        style={{ filter: BLUE_ICO }}
+                      />
                     </div>
                   )}
                   <span className="text-gray-800 font-medium text-[15px]">{item.label}</span>
