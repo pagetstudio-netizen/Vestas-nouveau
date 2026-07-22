@@ -375,18 +375,9 @@ export default function MyProductsPage() {
             </div>
 
             <div className="mx-6 mb-3">
-              {balance < confirmProduct.price ? (
-                <div className="flex items-center gap-2 p-2.5 bg-red-500/20 border border-red-400/30 rounded-xl">
-                  <AlertTriangle className="w-4 h-4 text-red-300 shrink-0" />
-                  <p className="text-xs text-red-200">
-                    Solde insuffisant. Il vous manque {formatCurrency(confirmProduct.price - balance, user.country)}.
-                  </p>
-                </div>
-              ) : (
-                <p className="text-white/70 text-xs text-center font-semibold">
-                  Chaque personne ne peut acheter qu'un seul article par jour.
-                </p>
-              )}
+              <p className="text-white/70 text-xs text-center font-semibold">
+                Chaque personne ne peut acheter qu'un seul article par jour.
+              </p>
             </div>
 
             <div className="flex gap-3 px-6 pb-6 pt-1">
