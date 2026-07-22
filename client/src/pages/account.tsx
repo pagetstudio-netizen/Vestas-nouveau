@@ -86,10 +86,10 @@ export default function AccountPage() {
         ══════════════════════════════════════════ */}
         <div
           className="relative w-full overflow-hidden"
-          style={{ background: "#000", minHeight: 210 }}
+          style={{ background: "#000" }}
         >
           {/* Content layer */}
-          <div className="relative z-10 px-5 pt-6 pb-5 flex items-stretch justify-between">
+          <div className="relative z-10 px-5 pt-6 pb-2 flex items-stretch justify-between">
 
             {/* LEFT: logo row + balance */}
             <div className="flex flex-col justify-between gap-3">
