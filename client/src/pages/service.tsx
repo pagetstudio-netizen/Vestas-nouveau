@@ -11,6 +11,7 @@ import {
 } from "react-icons/si";
 
 import heroImg from "@assets/téléchargement_(16)_1784561452683.jpeg";
+import tgIcon  from "@assets/tg-1_1784762866712.png";
 
 interface LinksSettings {
   supportLink: string;
@@ -45,6 +46,13 @@ const NETWORK_CONFIG: Record<NetworkType, { Icon: React.ElementType; color: stri
 };
 
 function NetworkIcon({ type }: { type: string }) {
+  if (type === "telegram") {
+    return (
+      <div className="w-11 h-11 rounded-full flex-shrink-0 overflow-hidden">
+        <img src={tgIcon} alt="Telegram" className="w-full h-full object-cover" />
+      </div>
+    );
+  }
   const cfg = NETWORK_CONFIG[(type as NetworkType)] || NETWORK_CONFIG.telegram;
   const { Icon, color, bg } = cfg;
   return (
