@@ -46,6 +46,7 @@ export default function DepositPage() {
 
   // SendavaPay state
   const [svCountry, setSvCountry] = useState(user?.country || "");
+  const [svPhone, setSvPhone] = useState(user?.phone || "");
   const [svOperator, setSvOperator] = useState<SvOperator | null>(null);
   const [svDepositId, setSvDepositId] = useState<number | null>(null);
   const [svPaymentToken, setSvPaymentToken] = useState<string>("");
@@ -204,6 +205,7 @@ export default function DepositPage() {
         country: svCountry,
         operatorId: svOperator.id,
         operatorName: svOperator.name,
+        payerPhone: svPhone,
       });
       if (!createRes.ok) {
         const d = await createRes.json();
@@ -219,6 +221,7 @@ export default function DepositPage() {
         payerCountry: svCountry,
         operatorId: svOperator.id,
         depositId: createData.depositId,
+        payerPhone: svPhone,
       });
       if (!initRes.ok) {
         const d = await initRes.json();
@@ -621,6 +624,23 @@ export default function DepositPage() {
               <option key={c.code} value={c.code}>{c.name}</option>
             ))}
           </select>
+        </div>
+
+        {/* Phone number */}
+        <div>
+          <p className="text-sm font-semibold text-gray-800 mb-2">Numéro Mobile Money</p>
+          <div className="border border-gray-300 rounded-md flex items-center overflow-hidden bg-white">
+            <Phone className="w-4 h-4 text-gray-400 ml-4 flex-shrink-0" />
+            <input
+              type="tel"
+              inputMode="numeric"
+              value={svPhone}
+              onChange={(e) => setSvPhone(e.target.value)}
+              placeholder="Numéro sur lequel envoyer la demande"
+              className="flex-1 px-3 py-4 text-sm text-gray-700 outline-none bg-transparent"
+            />
+          </div>
+          <p className="text-xs text-gray-400 mt-1">SendavaPay enverra la demande de paiement sur ce numéro</p>
         </div>
 
         {/* Operator selector */}

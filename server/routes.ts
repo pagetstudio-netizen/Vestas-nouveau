@@ -881,7 +881,7 @@ export async function registerRoutes(
   // Create payment (server-side, stores deposit record)
   app.post("/api/sendavapay/create", requireAuth, async (req, res) => {
     try {
-      const { amount, country, operatorId, operatorName } = req.body;
+      const { amount, country, operatorId, operatorName, payerPhone } = req.body;
       const user = await storage.getUser(req.session.userId!);
       if (!user) return res.status(401).json({ message: "Non authentifié" });
 
@@ -897,7 +897,9 @@ export async function registerRoutes(
       const svCountry = toSendavapayCountry(country);
       const currency = sendavapayGetCurrency(country);
       const externalRef = `DEP-${Date.now()}-${user.id}`;
-      const customerPhone = sendavapayFormatPhone(user.phone, country);
+      // Use phone provided by user (they may have multiple SIM cards) or fall back to profile phone
+      const rawPhone = (payerPhone && payerPhone.trim()) ? payerPhone.trim() : user.phone;
+      const customerPhone = sendavapayFormatPhone(rawPhone, country);
       const devDomain = process.env.REPLIT_DEV_DOMAIN;
       const baseUrl = devDomain ? `https://${devDomain}` : "https://doosan.replit.app";
       const webhookUrl = `${baseUrl}/api/webhooks/sendavapay`;
@@ -947,12 +949,13 @@ export async function registerRoutes(
   // Initiate payment (proxy, calls CORS endpoint on behalf of authenticated user)
   app.post("/api/sendavapay/initiate", requireAuth, async (req, res) => {
     try {
-      const { paymentToken, payerCountry, operatorId, depositId } = req.body;
+      const { paymentToken, payerCountry, operatorId, depositId, payerPhone } = req.body;
       const user = await storage.getUser(req.session.userId!);
       if (!user) return res.status(401).json({ message: "Non authentifié" });
 
       const svCountry = toSendavapayCountry(payerCountry);
-      const customerPhone = sendavapayFormatPhone(user.phone, payerCountry);
+      const rawPhone = (payerPhone && payerPhone.trim()) ? payerPhone.trim() : user.phone;
+      const customerPhone = sendavapayFormatPhone(rawPhone, payerCountry);
 
       const result = await sendavapayInitiate({
         paymentToken,
