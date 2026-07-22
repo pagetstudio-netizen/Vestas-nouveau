@@ -191,6 +191,7 @@ export async function seed() {
     { key: "groupType", value: "telegram" },
     { key: "groupLabel", value: "Groupe de discussion" },
     { key: "popupButtonLabel", value: "Cliquez ici pour rejoindre le groupe Telegram" },
+   { key: "noticeText", value: "Bienvenue sur Doosan Robotics Investment Platform ! Investissez dans nos robots industriels et générez des revenus quotidiens. Rejoignez notre communauté et commencez à gagner dès aujourd'hui !" },
     { key: "supportEnabled", value: "true" },
     { key: "support2Enabled", value: "true" },
     { key: "channelEnabled", value: "true" },

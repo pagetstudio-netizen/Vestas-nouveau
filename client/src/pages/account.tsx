@@ -10,8 +10,12 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-import robotImg    from "@assets/ai-robot-typing-on-ipad-isolated-on-transparent-background-fre_1784755325508.png";
-import doosanLogo  from "@assets/channels4_profile_1784755325592.jpg";
+import robotImg      from "@assets/ai-robot-typing-on-ipad-isolated-on-transparent-background-fre_1784755325508.png";
+import doosanLogo    from "@assets/channels4_profile_1784755325592.jpg";
+import iconBell      from "@assets/d68b81d4-3a8a-4ba0-804f-d77f381cb5ab_1784755516755.png";
+import iconGiftNew   from "@assets/0dbab192-27c3-4e50-8c09-17603ef394d1_1784755516794.png";
+import bgMachinery   from "@assets/téléchargement_(20)_1784755537225.jpeg";
+import bgCorporate   from "@assets/téléchargement_(15)_1784755566226.jpeg";
 
 import iconRecords    from "@assets/mine-mod-records-DgHXSKa1_1782689837747.png";
 import iconGift       from "@assets/téléchargement_(66)_1782689859239.png";
@@ -25,7 +29,10 @@ import iconSalaire    from "@assets/téléchargement_(63)_1783248791872.png";
 import iconRecharger  from "@assets/1-1_1783245823715.png";
 import iconRetraits   from "@assets/2-1_1783245823825.png";
 
-const WHITE = "brightness(0) invert(1)";
+const WHITE      = "brightness(0) invert(1)";
+const BLUE_ICO   = "brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(900%) hue-rotate(188deg)";
+/* Bell : gold/amber to stand out on dark background */
+const BELL_COLOR = "brightness(0) saturate(100%) invert(78%) sepia(80%) saturate(600%) hue-rotate(5deg) brightness(105%)";
 
 export default function AccountPage() {
   const { user, logout } = useAuth();
@@ -35,7 +42,7 @@ export default function AccountPage() {
   const [adminPin, setAdminPin] = useState("");
 
   const { data: products } = useQuery<any[]>({ queryKey: ["/api/user-products"] });
-  const { data: settings }  = useQuery<Record<string, string>>({ queryKey: ["/api/settings"] });
+  const { data: settings } = useQuery<Record<string, string>>({ queryKey: ["/api/settings"] });
 
   const verifyPinMutation = useMutation({
     mutationFn: async (pin: string) => {
@@ -56,57 +63,58 @@ export default function AccountPage() {
 
   if (!user) return null;
 
-  const balance       = parseFloat(user.balance || "0");
-  const totalEarnings = products?.reduce((s: number, p: any) => s + parseFloat(p.dailyIncome || "0"), 0) || 0;
-  const country       = getCountryByCode(user.country);
-  const currency      = country?.currency || "FCFA";
-  const phonePrefix   = country?.phonePrefix || "";
+  const balance        = parseFloat(user.balance || "0");
+  const totalEarnings  = products?.reduce((s: number, p: any) => s + parseFloat(p.dailyIncome || "0"), 0) || 0;
+  const activeProducts = products?.length ?? 0;
+  const country        = getCountryByCode(user.country);
+  const currency       = country?.currency || "FCFA";
+  const phonePrefix    = country?.phonePrefix || "";
+  const noticeText     = settings?.noticeText ||
+    "Bienvenue sur Doosan Robotics ! Investissez dans nos robots industriels et générez des revenus quotidiens.";
 
-  /* ── list menu items ─────────────────────────────────────── */
   const menuItems = [
-    { icon: doosanLogo,   label: "Mes robots",              href: "/invest",           isLogo: true },
-    { icon: iconSalaire,  label: "Récompense Salariale",    href: "/salary-bonus",     isLogo: false },
-    { icon: iconGift,     label: "Échangeur de codes",      href: "/gift-code",        isLogo: false },
-    { icon: iconWallet,   label: "Ma carte bancaire",       href: "/wallet",           isLogo: false },
-    { icon: iconChangePwd,label: "Sécurité",                href: "/change-password",  isLogo: false },
-    { icon: iconAbout,    label: "À propos de nous",        href: "/about",            isLogo: false },
-    { icon: iconRecords,  label: "Règles de la plateforme", href: "/rules",            isLogo: false },
-    { icon: iconCS,       label: "Service client",          href: "/service",          isLogo: false },
+    { icon: doosanLogo,    label: "Mes robots",              href: "/invest",          isLogo: true  },
+    { icon: iconSalaire,   label: "Récompense Salariale",    href: "/salary-bonus",    isLogo: false },
+    { icon: iconWallet,    label: "Ma carte bancaire",        href: "/wallet",          isLogo: false },
+    { icon: iconChangePwd, label: "Sécurité",                href: "/change-password", isLogo: false },
+    { icon: iconAbout,     label: "À propos de nous",        href: "/about",           isLogo: false },
+    { icon: iconRecords,   label: "Règles de la plateforme", href: "/rules",           isLogo: false },
+    { icon: iconCS,        label: "Service client",          href: "/service",         isLogo: false },
   ];
 
   return (
     <div className="flex flex-col min-h-screen bg-black">
+      {/* Keyframe for marquee — injected inline so no extra CSS file needed */}
+      <style>{`
+        @keyframes marquee {
+          0%   { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+        .marquee-track { animation: marquee 22s linear infinite; white-space: nowrap; }
+      `}</style>
+
       <div className="flex-1 overflow-y-auto pb-24">
 
         {/* ═══ HERO — black section ═══ */}
-        <div className="relative overflow-hidden" style={{ background: "#0a0a0a", minHeight: 260 }}>
-
-          {/* Robot image — right side, large, cropped */}
+        <div className="relative overflow-hidden" style={{ background: "#0a0a0a", minHeight: 270 }}>
           <img
             src={robotImg}
             alt="robot"
             className="absolute bottom-0 right-0 pointer-events-none select-none"
-            style={{ height: 230, width: "auto", objectFit: "contain", opacity: 0.92 }}
+            style={{ height: 245, width: "auto", objectFit: "contain", opacity: 0.92 }}
           />
-
-          {/* Subtle gradient overlay so left text is readable */}
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{ background: "linear-gradient(90deg, #0a0a0a 55%, transparent 100%)" }}
+            style={{ background: "linear-gradient(90deg, #0a0a0a 52%, transparent 100%)" }}
           />
-
-          {/* Content */}
           <div className="relative z-10 px-5 pt-6">
-
             {/* Top row */}
             <div className="flex items-center justify-between mb-5">
               <p className="text-white font-extrabold text-2xl tracking-wide">Le mien</p>
               <img src={iconSalaire} alt="" className="w-7 h-7 object-contain" style={{ filter: WHITE }} />
             </div>
-
             {/* Profile row */}
             <div className="flex items-center gap-3 mb-5">
-              {/* Doosan logo circle */}
               <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/30 shrink-0 bg-[#1565C0]">
                 <img src={doosanLogo} alt="Doosan" className="w-full h-full object-cover" />
               </div>
@@ -117,14 +125,118 @@ export default function AccountPage() {
                 <p className="text-white/50 text-xs mt-0.5">ID : {user.referralCode}</p>
               </div>
             </div>
-
-            {/* Balance */}
+            {/* Balance headline */}
             <div className="mb-4">
               <p className="text-white font-extrabold text-3xl leading-none" data-testid="text-balance">
                 {currency} {balance.toFixed(2)}
               </p>
               <p className="text-white/50 text-sm mt-1">Solde du compte</p>
             </div>
+          </div>
+        </div>
+
+        {/* ═══ 4 action buttons ═══ */}
+        <div
+          className="mx-4 mt-3 rounded-2xl grid grid-cols-4"
+          style={{ background: "#111", border: "1px solid #222" }}
+        >
+          {[
+            { icon: iconRecharger, label: "Recharger",      href: "/deposit"    },
+            { icon: iconRetraits,  label: "Retirer",        href: "/withdrawal" },
+            { icon: iconRecords,   label: "Registres",      href: "/history"    },
+            { icon: iconGiftNew,   label: "Code cadeau",    href: "/gift-code", raw: true },
+          ].map((item, i) => (
+            <Link href={item.href} key={i}>
+              <button className="flex flex-col items-center justify-center gap-2 py-4 w-full active:bg-white/5 rounded-2xl">
+                <img
+                  src={item.icon}
+                  alt={item.label}
+                  className="w-8 h-8 object-contain"
+                  style={item.raw ? {} : { filter: WHITE }}
+                />
+                <span className="text-white/80 text-[10px] font-medium text-center leading-tight px-0.5">{item.label}</span>
+              </button>
+            </Link>
+          ))}
+        </div>
+
+        {/* ═══ Scrolling notification ticker ═══ */}
+        <div
+          className="mx-4 mt-3 rounded-xl overflow-hidden flex items-center gap-3 px-3 py-2.5"
+          style={{ background: "#1a1a1a", border: "1px solid #2a2a2a" }}
+        >
+          <img
+            src={iconBell}
+            alt="notif"
+            className="w-5 h-5 object-contain shrink-0"
+            style={{ filter: BELL_COLOR }}
+          />
+          <div className="flex-1 overflow-hidden">
+            <p className="marquee-track text-white/80 text-xs font-medium">
+              {noticeText}
+            </p>
+          </div>
+        </div>
+
+        {/* ═══ Large balance cards with background images ═══ */}
+        <div className="mx-4 mt-3 grid grid-cols-2 gap-3">
+
+          {/* Card 1 — Solde (machinery background, large) */}
+          <div
+            className="rounded-2xl overflow-hidden relative col-span-1"
+            style={{ height: 170 }}
+          >
+            <img src={bgMachinery} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            {/* Dark overlay */}
+            <div
+              className="absolute inset-0"
+              style={{ background: "linear-gradient(160deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 100%)" }}
+            />
+            <div className="relative z-10 p-4 flex flex-col justify-between h-full">
+              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide">Balance</p>
+              <div>
+                <p className="text-white font-extrabold text-xl leading-tight" data-testid="text-balance-card">
+                  {balance.toFixed(2)}
+                </p>
+                <p className="text-white/70 text-[11px] mt-0.5">{currency}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right column — 2 stacked cards */}
+          <div className="flex flex-col gap-3">
+
+            {/* Card 2 — Revenus cumulatifs (corporate background) */}
+            <div
+              className="rounded-2xl overflow-hidden relative"
+              style={{ height: 80 }}
+            >
+              <img src={bgCorporate} alt="" className="absolute inset-0 w-full h-full object-cover object-top" />
+              <div
+                className="absolute inset-0"
+                style={{ background: "rgba(0,0,0,0.55)" }}
+              />
+              <div className="relative z-10 p-3 flex flex-col justify-between h-full">
+                <p className="text-white/80 text-[10px] font-semibold uppercase tracking-wide">Cumulatif</p>
+                <p className="text-white font-extrabold text-base leading-none" data-testid="text-earnings-card">
+                  {totalEarnings.toFixed(2)} <span className="text-[10px] font-normal text-white/70">{currency}</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Card 3 — Produits actifs (dark solid) */}
+            <div
+              className="rounded-2xl overflow-hidden relative"
+              style={{ height: 80, background: "linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)" }}
+            >
+              <div className="absolute inset-0 opacity-10"
+                style={{ backgroundImage: "radial-gradient(circle at 70% 30%, #fff 0%, transparent 60%)" }} />
+              <div className="relative z-10 p-3 flex flex-col justify-between h-full">
+                <p className="text-white/80 text-[10px] font-semibold uppercase tracking-wide">Produits actifs</p>
+                <p className="text-white font-extrabold text-2xl leading-none">{activeProducts}</p>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -142,32 +254,13 @@ export default function AccountPage() {
             <div className="flex items-center gap-3">
               <img src={robotImg} alt="" className="w-14 h-14 object-contain" style={{ opacity: 0.85 }} />
               <span
-                className="text-white font-bold text-sm px-3 py-1 rounded-lg"
+                className="text-white font-bold text-sm px-3 py-1 rounded-lg shrink-0"
                 style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}
               >
                 Aller
               </span>
             </div>
           </button>
-        </div>
-
-        {/* ═══ 3 action buttons ═══ */}
-        <div
-          className="mx-4 mt-3 rounded-2xl grid grid-cols-3"
-          style={{ background: "#111", border: "1px solid #222" }}
-        >
-          {[
-            { icon: iconRecharger, label: "Recharger",             href: "/deposit"  },
-            { icon: iconWithdraw,  label: "Retirer de l'argent",   href: "/withdrawal" },
-            { icon: iconRecords,   label: "Registres de comptes",  href: "/history"  },
-          ].map((item, i) => (
-            <Link href={item.href} key={i}>
-              <button className="flex flex-col items-center justify-center gap-2 py-5 w-full active:bg-white/5 rounded-2xl">
-                <img src={item.icon} alt={item.label} className="w-8 h-8 object-contain" style={{ filter: WHITE }} />
-                <span className="text-white/80 text-[11px] font-medium text-center leading-tight px-1">{item.label}</span>
-              </button>
-            </Link>
-          ))}
         </div>
 
         {/* ═══ White list section ═══ */}
@@ -186,7 +279,7 @@ export default function AccountPage() {
                   ) : (
                     <div className="w-9 h-9 flex items-center justify-center shrink-0">
                       <img src={item.icon} alt={item.label} className="w-7 h-7 object-contain"
-                        style={{ filter: "brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(900%) hue-rotate(188deg)" }} />
+                        style={{ filter: BLUE_ICO }} />
                     </div>
                   )}
                   <span className="text-gray-800 font-medium text-[15px]">{item.label}</span>
