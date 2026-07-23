@@ -1,3 +1,4 @@
 - [Doosan Platform Setup](vestas-platform.md) — Platform rebranded Intel→Vestas→Doosan (robotics). Key colors, assets, and DB quirks documented.
 - [SendavaPay integration](sendavapay-integration.md) — Payin deposit flow: backend creates+initiates, user phone auto-used, OTP/redirect handled, webhook HMAC verified.
 - [Imported database setup](imported-database-setup.md) — Preserve an existing Replit session table when applying a first-run Drizzle schema.
+- [Plesk GitHub deployment](plesk-github-deployment.md) — Plesk pulls a committed dist build and starts dist/index.cjs relative to the application root.
