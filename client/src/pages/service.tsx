@@ -176,12 +176,24 @@ export default function ServicePage() {
 
       {/* ── Hours Card ── */}
       <div className="mx-3 mt-3 pb-24">
-        <div className="bg-white rounded-2xl shadow-sm px-6 py-5 text-center">
-          <p className="text-2xl font-black text-gray-900 tracking-wide">{hoursDisplay}</p>
-          <p className="text-xs text-gray-400 mt-2">Heures de retrait : 24h.</p>
-          <p className="text-xs text-gray-400 mt-0.5">
-            Horaires du service client : {startHour}h - {endHour}h.
-          </p>
+        <div
+          className="rounded-2xl shadow-sm px-6 py-5 text-center overflow-hidden relative"
+          style={{
+            backgroundImage: "url('/doosan-robotics-bg.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          {/* dark overlay */}
+          <div className="absolute inset-0 bg-black/55 rounded-2xl" />
+          {/* content */}
+          <div className="relative z-10">
+            <p className="text-2xl font-black text-white tracking-wide">{hoursDisplay}</p>
+            <p className="text-xs text-white/70 mt-2">Heures de retrait : 24h.</p>
+            <p className="text-xs text-white/70 mt-0.5">
+              Horaires du service client : {startHour}h - {endHour}h.
+            </p>
+          </div>
         </div>
       </div>
 
