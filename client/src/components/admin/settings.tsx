@@ -534,14 +534,14 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
               <FormItem>
                 <FormLabel>Webhook Secret</FormLabel>
                 <FormControl><Input {...field} type="password" placeholder="whsec_..." /></FormControl>
-                <FormDescription className="text-xs">Secret retourné par SendavaPay lors de la configuration du webhook. Laissez vide pour désactiver la vérification de signature.</FormDescription>
+                <FormDescription className="text-xs">Vous pouvez aussi configurer SENDAVAPAY_WEBHOOK_SECRET dans les Secrets/variables d'environnement du serveur. Cette variable est prioritaire. Laissez les deux champs vides uniquement si vous désactivez la vérification de signature.</FormDescription>
                 <FormMessage />
               </FormItem>
             )} />
             <div className="rounded-xl bg-blue-50 border border-blue-100 p-3 text-xs text-blue-700 space-y-1">
               <p className="font-semibold">Configuration requise :</p>
               <p>1. Ajoutez la variable d'environnement <code className="bg-blue-100 px-1 rounded">SENDAVAPAY_API_KEY</code> avec votre clé SDK (commence par <code className="bg-blue-100 px-1 rounded">sdk_</code>)</p>
-              <p>2. Configurez l'URL webhook dans votre compte SendavaPay : <code className="bg-blue-100 px-1 rounded">/api/webhooks/sendavapay</code></p>
+              <p>2. Ajoutez le secret Webhook dans SENDAVAPAY_WEBHOOK_SECRET, puis configurez l'URL webhook dans votre compte SendavaPay : <code className="bg-blue-100 px-1 rounded">/api/webhooks/sendavapay</code></p>
             </div>
           </CardContent>
         </Card>

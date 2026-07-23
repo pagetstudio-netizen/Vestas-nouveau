@@ -1090,7 +1090,9 @@ export async function registerRoutes(
     async (req, res) => {
       try {
         const settings = await storage.getSettings();
-        const secret = settings.sendavapayWebhookSecret || "";
+        // Prefer the deployment secret; keep the admin setting as a
+        // backwards-compatible fallback for existing installations.
+        const secret = process.env.SENDAVAPAY_WEBHOOK_SECRET || settings.sendavapayWebhookSecret || "";
         const sig = req.headers["x-sendavapay-signature"] as string || "";
 
         if (secret && !sendavapayVerifySignature(req.body as Buffer, sig, secret)) {
