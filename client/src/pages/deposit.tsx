@@ -650,7 +650,6 @@ export default function DepositPage() {
               className="flex-1 px-3 py-4 text-sm text-gray-700 outline-none bg-transparent"
             />
           </div>
-          <p className="text-xs text-gray-400 mt-1">SendavaPay enverra la demande de paiement sur ce numéro</p>
         </div>
 
         {/* Operator selector */}
