@@ -99,7 +99,7 @@ const Divider = () => (
 
 /* Row */
 const Row = ({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) => (
-  <div className="flex items-center justify-between px-4 py-2">
+  <div className="flex items-center justify-between px-4" style={{ paddingTop: 7, paddingBottom: 7 }}>
     <span style={{ color: "#9ca3af", fontSize: 13 }}>{label}</span>
     <span style={{ color: valueColor ?? "#374151", fontSize: 13, fontWeight: 500 }}>{value}</span>
   </div>
