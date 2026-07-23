@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCountryByCode } from "@/lib/countries";
-import { ChevronLeft, Loader2, RefreshCw, Copy } from "lucide-react";
+import { ChevronLeft, Loader2, RefreshCw } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
@@ -33,6 +33,7 @@ interface Withdrawal {
 }
 
 const BG = "linear-gradient(160deg, #1565C0 0%, #1976D2 70%, #1E88E5 100%)";
+const CARD_GREEN = "#3d9e4e";
 
 /* Generate a reference starting with "sdk" */
 const makeRef = (prefix: "D" | "W", id: number, date: string) => {
@@ -60,43 +61,49 @@ const getWithdrawalRef = (w: Withdrawal) => {
   return makeRef("W", w.id, w.createdAt);
 };
 
-const formatDate = (dateString: string) => {
+/** Mask a reference: keep first 2 and last 4 chars, replace middle with **** */
+const maskRef = (ref: string) => {
+  if (ref.length <= 6) return ref;
+  return ref.slice(0, 2) + "****" + ref.slice(-4);
+};
+
+const formatDateTime = (dateString: string) => {
   const d = new Date(dateString);
-  const mm  = String(d.getMonth() + 1).padStart(2, "0");
-  const dd  = String(d.getDate()).padStart(2, "0");
+  const dd   = String(d.getDate()).padStart(2, "0");
+  const mm   = String(d.getMonth() + 1).padStart(2, "0");
   const yyyy = d.getFullYear();
-  const hh  = String(d.getHours()).padStart(2, "0");
-  const min = String(d.getMinutes()).padStart(2, "0");
-  const ss  = String(d.getSeconds()).padStart(2, "0");
-  return `${mm}/${dd}/${yyyy} ${hh}:${min}:${ss}`;
+  const hh   = String(d.getHours()).padStart(2, "0");
+  const min  = String(d.getMinutes()).padStart(2, "0");
+  const ss   = String(d.getSeconds()).padStart(2, "0");
+  return `${dd}/${mm}/${yyyy} ${hh}:${min}:${ss}`;
 };
 
 const getStatusInfo = (status: string) => {
   switch (status) {
     case "completed":
     case "approved":
-      return { label: "Approuvé",       textColor: "#16a34a", badgeBg: "#dcfce7", badgeText: "#15803d" };
+      return { label: "Approuvé",      color: "#16a34a" };
     case "rejected":
-      return { label: "Rejeté",         textColor: "#dc2626", badgeBg: "#fee2e2", badgeText: "#b91c1c" };
+      return { label: "Rejeté",        color: "#dc2626" };
     case "processing":
-      return { label: "En traitement",  textColor: "#d97706", badgeBg: "#fef3c7", badgeText: "#b45309" };
+      return { label: "En traitement", color: "#d97706" };
     default:
-      return { label: "En attente...",  textColor: "#d97706", badgeBg: "#fef3c7", badgeText: "#b45309" };
+      return { label: "En attente...", color: "#d97706" };
   }
 };
 
-const CARD_GREEN = "#3d9e4e";
+/* Divider */
+const Divider = () => (
+  <div style={{ height: 1, background: "#f0f0f0", margin: "0 16px" }} />
+);
 
-function copyToClipboard(text: string, toast: ReturnType<typeof useToast>["toast"]) {
-  navigator.clipboard.writeText(text).then(() =>
-    toast({ title: "Copié !", description: text, duration: 1500 })
-  );
-}
-
-const formatDateShort = (dateString: string) => {
-  const d = new Date(dateString);
-  return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
-};
+/* Row */
+const Row = ({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) => (
+  <div className="flex items-center justify-between px-4 py-2">
+    <span style={{ color: "#9ca3af", fontSize: 13 }}>{label}</span>
+    <span style={{ color: valueColor ?? "#374151", fontSize: 13, fontWeight: 500 }}>{value}</span>
+  </div>
+);
 
 export default function HistoryPage() {
   const { user, refreshUser } = useAuth();
@@ -104,6 +111,8 @@ export default function HistoryPage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"deposits" | "withdrawals">("deposits");
   const [verifyingId, setVerifyingId] = useState<number | null>(null);
+
+  const isAdmin = !!(user as any)?.isAdmin;
 
   const countryInfo = user ? getCountryByCode(user.country) : null;
   const currency = countryInfo?.currency || "FCFA";
@@ -163,7 +172,7 @@ export default function HistoryPage() {
         <p className="flex-1 text-center text-white font-extrabold text-lg pr-9">Historique</p>
       </div>
 
-      {/* ── Tabs — gauche / droite bord écran ── */}
+      {/* ── Tabs ── */}
       <div className="flex mb-4">
         <button
           onClick={() => setActiveTab("deposits")}
@@ -190,85 +199,69 @@ export default function HistoryPage() {
       </div>
 
       {/* ── Content ── */}
-      <div className="flex-1 overflow-y-auto px-4 pb-8 space-y-3" style={{ background: "#f0f2f5", borderRadius: "16px 16px 0 0", marginTop: 2 }}>
-
+      <div
+        className="flex-1 overflow-y-auto pb-8 space-y-3 pt-3"
+        style={{ background: "#f0f2f5", borderRadius: "16px 16px 0 0", marginTop: 2, paddingLeft: 10, paddingRight: 10 }}
+      >
         {isLoading ? (
           <div className="flex justify-center py-16">
-            <Loader2 className="w-8 h-8 animate-spin text-white" />
+            <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
           </div>
 
         ) : (activeTab === "deposits" ? deposits : withdrawals).length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <img src={nodataImg} alt="Aucune donnée" className="w-28 h-28 object-contain opacity-90" />
-            <p className="text-white/70 text-sm">Aucune transaction pour le moment</p>
+            <p className="text-gray-400 text-sm">Plus de données</p>
           </div>
 
         ) : activeTab === "deposits" ? (
           deposits.map((deposit) => {
-            const { label: statusLabel, badgeBg, badgeText } = getStatusInfo(deposit.status);
+            const { label: statusLabel, color: statusColor } = getStatusInfo(deposit.status);
             const ref = getDepositRef(deposit);
+            const displayRef = isAdmin ? ref : maskRef(ref);
             const amt = parseFloat(deposit.amount);
             return (
               <div
                 key={deposit.id}
-                className="rounded-xl overflow-hidden shadow-md"
-                style={{ background: "#fff", border: "1px solid #e5e7eb" }}
+                className="rounded-xl overflow-hidden shadow-sm"
+                style={{ background: "#fff", border: "1px solid #e8e8e8" }}
                 data-testid={`deposit-item-${deposit.id}`}
               >
-                {/* Green header — reference + copy icon */}
-                <div
-                  className="flex items-center gap-2 px-4 py-2.5"
-                  style={{ background: CARD_GREEN }}
-                >
-                  <span className="text-white text-xs font-semibold shrink-0">Numéro de commande:</span>
-                  <span className="text-white text-xs font-bold flex-1 min-w-0 truncate">{ref}</span>
-                  <button
-                    onClick={() => copyToClipboard(ref, toast)}
-                    className="shrink-0 text-white/80 hover:text-white active:scale-95 transition-transform"
-                    data-testid={`button-copy-${deposit.id}`}
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
+                {/* Card header */}
+                <div className="flex items-center justify-between px-4 py-3">
+                  <span style={{ fontWeight: 700, fontSize: 15, color: "#111827" }}>Dépôt</span>
+                  <span style={{ fontWeight: 700, fontSize: 15, color: CARD_GREEN }}>
+                    {currency} {amt.toLocaleString("fr-FR")}
+                  </span>
                 </div>
 
-                {/* Body */}
-                <div className="px-4 py-3 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-500 text-sm">Montant</span>
-                    <span className="text-red-500 font-bold text-sm">
-                      {amt.toLocaleString("fr-FR")} {currency}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-500 text-sm">Condition</span>
-                    <span
-                      className="text-xs font-bold px-3 py-1 rounded-full max-w-[130px] truncate"
-                      style={{ background: badgeBg, color: badgeText }}
-                    >
-                      {statusLabel}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-500 text-sm">Date</span>
-                    <span className="text-gray-700 text-sm font-medium">{formatDateShort(deposit.createdAt)}</span>
-                  </div>
-                </div>
+                <Divider />
 
+                <Row label="Numéro" value={displayRef} />
+                <Divider />
+                <Row label="Un résultat" value={statusLabel} valueColor={statusColor} />
+                <Divider />
+                <Row label="Temps" value={formatDateTime(deposit.createdAt)} />
+
+                {/* Verify button — only for non-auto pending deposits */}
                 {isPendingDeposit(deposit) && !deposit.sendavapayReference && (
-                  <div className="px-4 pb-3">
-                    <button
-                      onClick={() => handleVerify(deposit.id)}
-                      disabled={verifyingId === deposit.id}
-                      className="w-full py-2 text-white text-xs font-bold rounded-full flex items-center justify-center gap-2 disabled:opacity-50"
-                      style={{ background: CARD_GREEN }}
-                      data-testid={`button-verify-${deposit.id}`}
-                    >
-                      {verifyingId === deposit.id
-                        ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        : <RefreshCw className="w-3.5 h-3.5" />}
-                      Vérifier la transaction
-                    </button>
-                  </div>
+                  <>
+                    <Divider />
+                    <div className="px-4 py-3">
+                      <button
+                        onClick={() => handleVerify(deposit.id)}
+                        disabled={verifyingId === deposit.id}
+                        className="w-full py-2 text-white text-xs font-bold rounded-full flex items-center justify-center gap-2 disabled:opacity-50"
+                        style={{ background: CARD_GREEN }}
+                        data-testid={`button-verify-${deposit.id}`}
+                      >
+                        {verifyingId === deposit.id
+                          ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          : <RefreshCw className="w-3.5 h-3.5" />}
+                        Vérifier la transaction
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
             );
@@ -276,54 +269,35 @@ export default function HistoryPage() {
 
         ) : (
           withdrawals.map((withdrawal) => {
-            const { label: statusLabel, badgeBg, badgeText } = getStatusInfo(withdrawal.status);
+            const { label: statusLabel, color: statusColor } = getStatusInfo(withdrawal.status);
             const ref = getWithdrawalRef(withdrawal);
+            const displayRef = isAdmin ? ref : maskRef(ref);
             const gross = parseFloat(withdrawal.amount);
+            const net   = parseFloat(withdrawal.netAmount ?? withdrawal.amount);
             return (
               <div
                 key={withdrawal.id}
-                className="rounded-xl overflow-hidden shadow-md"
-                style={{ background: "#fff", border: "1px solid #e5e7eb" }}
+                className="rounded-xl overflow-hidden shadow-sm"
+                style={{ background: "#fff", border: "1px solid #e8e8e8" }}
                 data-testid={`withdrawal-item-${withdrawal.id}`}
               >
-                {/* Green header — reference + copy icon */}
-                <div
-                  className="flex items-center gap-2 px-4 py-2.5"
-                  style={{ background: CARD_GREEN }}
-                >
-                  <span className="text-white text-xs font-semibold shrink-0">Numéro de commande:</span>
-                  <span className="text-white text-xs font-bold flex-1 min-w-0 truncate">{ref}</span>
-                  <button
-                    onClick={() => copyToClipboard(ref, toast)}
-                    className="shrink-0 text-white/80 hover:text-white active:scale-95 transition-transform"
-                    data-testid={`button-copy-w-${withdrawal.id}`}
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
+                {/* Card header */}
+                <div className="flex items-center justify-between px-4 py-3">
+                  <span style={{ fontWeight: 700, fontSize: 15, color: "#111827" }}>Retrait</span>
+                  <span style={{ fontWeight: 700, fontSize: 15, color: CARD_GREEN }}>
+                    {currency} {gross.toLocaleString("fr-FR")}
+                  </span>
                 </div>
 
-                {/* Body */}
-                <div className="px-4 py-3 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-500 text-sm">Montant</span>
-                    <span className="text-red-500 font-bold text-sm">
-                      {gross.toLocaleString("fr-FR")} {currency}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-500 text-sm">Condition</span>
-                    <span
-                      className="text-xs font-bold px-3 py-1 rounded-full max-w-[130px] truncate"
-                      style={{ background: badgeBg, color: badgeText }}
-                    >
-                      {statusLabel}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-500 text-sm">Date</span>
-                    <span className="text-gray-700 text-sm font-medium">{formatDateShort(withdrawal.createdAt)}</span>
-                  </div>
-                </div>
+                <Divider />
+
+                <Row label="Montant reçu" value={`${currency} ${net.toLocaleString("fr-FR")}`} />
+                <Divider />
+                <Row label="Compte" value={displayRef} />
+                <Divider />
+                <Row label="Un résultat" value={statusLabel} valueColor={statusColor} />
+                <Divider />
+                <Row label="Temps" value={formatDateTime(withdrawal.createdAt)} />
               </div>
             );
           })
