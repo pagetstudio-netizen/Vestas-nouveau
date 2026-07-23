@@ -53,6 +53,7 @@ expertMode = true
 [userenv]
 
 [userenv.shared]
+VITE_ADMIN_SECRET_PATH = "/mgmt-1np5g23g12"
 
 [postMerge]
 path = "scripts/post-merge.sh"

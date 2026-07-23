@@ -76,6 +76,18 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Security: block the well-known /admin path at the server level.
+  // Any request to /admin or /admin/* returns a plain 404, indistinguishable
+  // from a non-existent route. The real admin UI is served only under the
+  // secret path configured via VITE_ADMIN_SECRET_PATH.
+  app.use((req, res, next) => {
+    const p = req.path;
+    if (p === "/admin" || p.startsWith("/admin/")) {
+      return res.status(404).send("Not found");
+    }
+    next();
+  });
+
   // Seed database with initial data
   await seed().catch(console.error);
   

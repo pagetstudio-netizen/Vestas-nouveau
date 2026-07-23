@@ -42,12 +42,12 @@ export default function AccountPage() {
       if (!res.ok) { const d = await res.json(); throw new Error(d.message || "Code PIN incorrect"); }
       return res.json();
     },
-    onSuccess: () => { setShowPinModal(false); setAdminPin(""); navigate("/admin"); },
+    onSuccess: () => { setShowPinModal(false); setAdminPin(""); navigate(import.meta.env.VITE_ADMIN_SECRET_PATH); },
     onError:   (e: Error) => toast({ title: e.message, variant: "destructive" }),
   });
 
   const handleAdminClick = () => {
-    if (user?.isAdminPasswordRequired === false) { navigate("/admin"); return; }
+    if (user?.isAdminPasswordRequired === false) { navigate(import.meta.env.VITE_ADMIN_SECRET_PATH); return; }
     setShowPinModal(true);
   };
   const handleLogout = async () => { await logout(); navigate("/login"); };

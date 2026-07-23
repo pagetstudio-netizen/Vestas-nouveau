@@ -296,12 +296,17 @@ function Router() {
           </AppLayout>
         </ProtectedRoute>
       </Route>
-      <Route path="/admin">
+      {/* /admin is a decoy — the server already returns 404 for it,
+          but we also map it to NotFound on the client to be thorough. */}
+      <Route path="/admin" component={NotFound} />
+      <Route path="/admin/:rest*" component={NotFound} />
+      {/* Real admin panel is served under the secret path */}
+      <Route path={import.meta.env.VITE_ADMIN_SECRET_PATH}>
         <AdminRoute>
           <AdminPage />
         </AdminRoute>
       </Route>
-      <Route path="/admin/team/:id">
+      <Route path={`${import.meta.env.VITE_ADMIN_SECRET_PATH}/team/:id`}>
         <AdminRoute>
           <AdminTeamPage />
         </AdminRoute>
