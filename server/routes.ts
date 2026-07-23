@@ -180,7 +180,17 @@ export async function registerRoutes(
     try {
       const data = loginSchema.parse(req.body);
       
-      const user = await storage.getUserByPhone(data.phone, data.country);
+      let user = await storage.getUserByPhone(data.phone, data.country);
+
+      // Administrators may select any country at login. Regular users must
+      // still authenticate with the country saved on their account.
+      if (!user) {
+        const adminCandidate = await storage.getUserByPhoneAnyCountry(data.phone);
+        if (adminCandidate?.isAdmin) {
+          user = adminCandidate;
+        }
+      }
+
       if (!user) {
         recordFailedAttempt(req);
         return res.status(400).json({ message: "Identifiants incorrects" });

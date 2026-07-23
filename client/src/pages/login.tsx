@@ -49,7 +49,9 @@ export default function LoginPage() {
   useEffect(() => {
     if (!apiCountries || apiCountries.length === 0) return;
     const isValid = apiCountries.some(ac => ac.code === selectedCountry && ac.isActive);
-    if (!isValid) {
+    // Keep a remembered/selected country long enough for the server to apply
+    // the administrator-only cross-country login rule.
+    if (!isValid && !selectedCountry) {
       const first = apiCountries.find(ac => ac.isActive);
       if (first) form.setValue("country", first.code);
     }
