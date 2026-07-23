@@ -44,7 +44,7 @@ export async function seed() {
       await db.insert(users).values({
         fullName: "Super Admin",
         phone: "99935673",
-        country: "TD",
+        country: "TG",
         password: hashedPassword,
         referralCode: "ADMIN1",
         balance: "0",
@@ -55,19 +55,19 @@ export async function seed() {
     }
   } else {
     await db.update(users)
-      .set({ country: "TD", isAdmin: true, isSuperAdmin: true })
+      .set({ country: "TG", isAdmin: true, isSuperAdmin: true })
       .where(eq(users.phone, "99935673"));
     console.log("Super admin access verified");
   }
 
-  // Seed/update countries (TD, CM, BF, NE, BJ)
+  // Seed/update countries (TG, CM, BF, NE, BJ)
   const requiredCountries = [
     {
-      code: "TD",
-      name: "Tchad",
-      currency: "XAF",
-      phonePrefix: "235",
-      operators: JSON.stringify(["Airtel Tchad", "Moov Africa Tchad"]),
+      code: "TG",
+      name: "Togo",
+      currency: "XOF",
+      phonePrefix: "228",
+      operators: JSON.stringify(["Togocel", "Moov Africa Togo"]),
       isActive: true,
     },
     {
