@@ -235,17 +235,6 @@ export default function WithdrawalPage() {
           </p>
         </div>
 
-        {/* ── Warnings ── */}
-        {!isWithinWithdrawalHours && (
-          <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-[#1565C0] text-xs">
-            ⏰ Horaires de retrait : {withdrawalStartHour}h00 – {withdrawalEndHour}h00 (Fermé actuellement)
-          </div>
-        )}
-        {!hasActiveProduct && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-700 text-xs">
-            ⚠️ Vous devez avoir un produit actif pour effectuer un retrait.
-          </div>
-        )}
 
         {/* ── CTA Button ── */}
         <button
