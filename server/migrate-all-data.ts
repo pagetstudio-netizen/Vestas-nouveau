@@ -12,9 +12,9 @@ if (!SUPABASE_URL) {
 
 const supabasePool = new Pool({ connectionString: SUPABASE_URL });
 
-const USERS_DATA = [
-  {"id":1,"full_name":"Pagetsuperadmin","phone":"99935673","country":"TG","password":"$2b$10$dPH9jEKN5NB2NXqVDwPWTuLO4J5l6M0S77mP8G8g8QqA2O8vZ3Jte","referral_code":"PGSADM","referred_by":null,"balance":"10000000.00","today_earnings":"0.00","total_earnings":"0.00","is_admin":true,"is_super_admin":true,"is_banned":false,"is_withdrawal_blocked":false,"is_promoter":false,"must_invite_to_withdraw":false,"has_deposited":true,"has_active_product":true,"created_at":"2026-02-01 10:00:00.000","last_free_product_claim":null,"last_daily_bonus_claim":null,"promoter_set_by":null,"admin_set_by":null,"admin_set_at":null,"admin_pin":null,"is_admin_password_required":true},
-];
+// Historical user exports and password hashes must never be committed to source.
+// Supply an external, reviewed import file if this one-off migration is needed.
+const USERS_DATA: UserData[] = [];
 
 interface UserData {
   id: number;
@@ -120,7 +120,7 @@ async function main() {
   console.log(counts);
 
   console.log("\nInsertion des utilisateurs...");
-  const result = await insertUsers(USERS_DATA as UserData[]);
+  const result = await insertUsers(USERS_DATA);
   console.log(`  Insérés: ${result.inserted}, Ignorés: ${result.skipped}, Erreurs: ${result.errors}`);
 
   console.log("\nRéinitialisation des séquences...");

@@ -85,7 +85,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Environment Variables Required
 - `SUPABASE_DATABASE_URL` or `DATABASE_URL`: PostgreSQL connection string used for application data and sessions
-- `SESSION_SECRET`: Secret for session encryption (optional, has fallback)
+- `SESSION_SECRET`: Secret for session encryption (required)
 
 ## Running on Replit
 
@@ -102,10 +102,8 @@ npm run dev          # start the development server on port 5000
 
 The database is seeded automatically on first start (super admin, countries, products, tasks, payment channels, and platform settings).
 
-### Default super admin
-- **Phone**: 99935673  
-- **Country**: Togo (TG)  
-- **Password**: pagetstudio
+### Initial administrator
+The initial administrator is created only when `ADMIN_PASSWORD` is configured as a secret. Existing administrator records are preserved and are not reset during startup.
 
 ### Workflow
 The "Start application" workflow runs `npm run dev` and serves the app on port 5000 (mapped to external port 80).
@@ -127,12 +125,7 @@ The "Start application" workflow runs `npm run dev` and serves the app on port 5
 - Completed full frontend implementation with all pages and modals
 - Implemented complete backend with all API routes
 - Added database seeding for products, tasks, payment channels, and settings
-- Created super admin account (Togo +99935673 / password: pagetstudio)
 - Removed emoji usage in favor of text country codes
-
-## Admin Credentials
-- **Super Admin**: Phone: 99935673, Country: Togo (TG), Password: pagetstudio
-- Access the admin panel from Account page when logged in as admin
 
 ## Business Rules
 - **Signup Bonus**: 500 FCFA

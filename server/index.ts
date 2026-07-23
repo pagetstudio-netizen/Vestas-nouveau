@@ -36,6 +36,19 @@ export function log(message: string, source = "express") {
   console.log(`${formattedTime} [${source}] ${message}`);
 }
 
+function redactLogValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(redactLogValue);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>).map(([key, child]) => {
+      if (/password|secret|token|screenshot|accountNumber|adminPin/i.test(key)) {
+        return [key, "[redacted]"];
+      }
+      return [key, redactLogValue(child)];
+    }),
+  );
+}
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -52,7 +65,7 @@ app.use((req, res, next) => {
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+          logLine += ` :: ${JSON.stringify(redactLogValue(capturedJsonResponse))}`;
       }
 
       log(logLine);

@@ -336,27 +336,31 @@ export const insertUserSchema = createInsertSchema(users).omit({
 
 export const insertCountrySchema = createInsertSchema(countries).omit({ id: true });
 
+export const phoneNumberSchema = z.string()
+  .trim()
+  .regex(/^\+?[0-9]{8,15}$/, "Numéro de téléphone invalide");
+
 export const registerSchema = z.object({
-  fullName: z.string().min(2, "Le nom complet est requis"),
-  phone: z.string().min(8, "Numéro de téléphone invalide"),
-  country: z.string().min(2, "Le pays est requis"),
+  fullName: z.string().trim().min(2, "Le nom complet est requis").max(100, "Nom trop long"),
+  phone: phoneNumberSchema,
+  country: z.string().trim().regex(/^[A-Z]{2,3}$/, "Pays invalide"),
   password: z.string().min(6, "Le mot de passe doit avoir au moins 6 caractères"),
   invitationCode: z.string().optional(),
 });
 
 export const loginSchema = z.object({
-  phone: z.string().min(8, "Numéro de téléphone invalide"),
-  country: z.string().min(2, "Le pays est requis"),
+  phone: phoneNumberSchema,
+  country: z.string().trim().regex(/^[A-Z]{2,3}$/, "Pays invalide"),
   password: z.string().min(1, "Le mot de passe est requis"),
 });
 
 export const depositSchema = z.object({
   amount: z.number().min(2000, "Le montant minimum est de 2000 FCFA"),
-  accountName: z.string().min(2, "Le nom du compte est requis"),
-  accountNumber: z.string().min(8, "Le numéro de paiement est requis"),
-  country: z.string().min(2, "Le pays est requis"),
-  paymentMethod: z.string().min(2, "Le moyen de paiement est requis"),
-  paymentChannelId: z.number(),
+  accountName: z.string().trim().min(2, "Le nom du compte est requis").max(100, "Nom trop long"),
+  accountNumber: phoneNumberSchema,
+  country: z.string().trim().regex(/^[A-Z]{2,3}$/, "Pays invalide"),
+  paymentMethod: z.string().trim().min(2, "Le moyen de paiement est requis").max(60, "Moyen de paiement invalide"),
+  paymentChannelId: z.number().optional(),
 });
 
 export const withdrawalSchema = z.object({
@@ -364,10 +368,10 @@ export const withdrawalSchema = z.object({
 });
 
 export const walletSchema = z.object({
-  accountName: z.string().min(2, "Le nom du compte est requis"),
-  accountNumber: z.string().min(8, "Le numéro est requis"),
-  paymentMethod: z.string().min(2, "Le moyen de paiement est requis"),
-  country: z.string().min(2, "Le pays est requis"),
+  accountName: z.string().trim().min(2, "Le nom du compte est requis").max(100, "Nom trop long"),
+  accountNumber: phoneNumberSchema,
+  paymentMethod: z.string().trim().min(2, "Le moyen de paiement est requis").max(60, "Moyen de paiement invalide"),
+  country: z.string().trim().regex(/^[A-Z]{2,3}$/, "Pays invalide"),
 });
 
 export const giftCodeSchema = z.object({

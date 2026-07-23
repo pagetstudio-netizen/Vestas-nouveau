@@ -27,16 +27,12 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [countryModalOpen, setCountryModalOpen] = useState(false);
 
-  const savedCredentials = typeof window !== "undefined" ? localStorage.getItem("doosan_credentials") : null;
-  const parsedCredentials = savedCredentials ? JSON.parse(savedCredentials) : null;
-  const [rememberMe, setRememberMe] = useState(!!parsedCredentials);
-
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      phone: parsedCredentials?.phone || "",
-      country: parsedCredentials?.country || "TD",
-      password: parsedCredentials?.password || "",
+      phone: "",
+      country: "TD",
+      password: "",
     },
   });
 
@@ -45,6 +41,12 @@ export default function LoginPage() {
   });
 
   const selectedCountry = form.watch("country");
+
+  useEffect(() => {
+    // Remove credentials persisted by versions that stored login data locally.
+    localStorage.removeItem("doosan_credentials");
+    localStorage.removeItem("doosan_login_preferences");
+  }, []);
 
   useEffect(() => {
     if (!apiCountries || apiCountries.length === 0) return;
@@ -71,11 +73,6 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await login(data.phone, data.country, data.password);
-      if (rememberMe) {
-        localStorage.setItem("doosan_credentials", JSON.stringify({ phone: data.phone, country: data.country, password: data.password }));
-      } else {
-        localStorage.removeItem("doosan_credentials");
-      }
       navigate("/");
     } catch (error: any) {
       toast({ title: "Erreur de connexion", description: error.message || "Vérifiez vos informations", variant: "destructive" });
@@ -126,6 +123,7 @@ export default function LoginPage() {
             <input
               {...form.register("phone")}
               type="tel"
+              autoComplete="username"
               placeholder="Entrez votre identifiant"
               className="flex-1 bg-transparent text-white placeholder:text-white/40 text-base outline-none"
               data-testid="input-phone"
@@ -143,6 +141,7 @@ export default function LoginPage() {
             <input
               {...form.register("password")}
               type="password"
+              autoComplete="current-password"
               placeholder="Mot de passe"
               className="flex-1 bg-transparent text-white placeholder:text-white/40 text-base outline-none"
               data-testid="input-password"
@@ -151,20 +150,6 @@ export default function LoginPage() {
           {form.formState.errors.password && (
             <p className="text-red-400 text-xs -mt-1 ml-1">{form.formState.errors.password.message}</p>
           )}
-
-          <div className="flex items-center gap-2 mt-1">
-            <input
-              type="checkbox"
-              id="remember"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              className="w-4 h-4"
-              data-testid="checkbox-remember"
-            />
-            <label htmlFor="remember" className="text-white/60 text-sm cursor-pointer">
-              Se souvenir de mon mot de passe
-            </label>
-          </div>
 
           <button
             type="submit"

@@ -34,29 +34,30 @@ export async function seed() {
 
   // Check if admin already exists
   const existingAdmin = await db.select().from(users).where(eq(users.phone, "99935673"));
-  const adminPassword = process.env.ADMIN_PASSWORD || "AAbb11##";
+  const adminPassword = process.env.ADMIN_PASSWORD;
 
   if (existingAdmin.length === 0) {
-    const hashedPassword = await bcrypt.hash(adminPassword, 12);
-    await db.insert(users).values({
-      fullName: "Super Admin",
-      phone: "99935673",
-      country: "TD",
-      password: hashedPassword,
-      referralCode: "ADMIN1",
-      balance: "0",
-      isAdmin: true,
-      isSuperAdmin: true,
-      adminPin: "9993",
-    });
-    console.log("Super admin created");
+    if (!adminPassword) {
+      console.warn("No administrator exists yet; set ADMIN_PASSWORD to provision the initial admin.");
+    } else {
+      const hashedPassword = await bcrypt.hash(adminPassword, 12);
+      await db.insert(users).values({
+        fullName: "Super Admin",
+        phone: "99935673",
+        country: "TD",
+        password: hashedPassword,
+        referralCode: "ADMIN1",
+        balance: "0",
+        isAdmin: true,
+        isSuperAdmin: true,
+      });
+      console.log("Super admin created");
+    }
   } else {
-    // Always ensure correct country and up-to-date password
-    const hashedPassword = await bcrypt.hash(adminPassword, 12);
     await db.update(users)
-      .set({ country: "TD", password: hashedPassword, isAdmin: true, isSuperAdmin: true, adminPin: "9993" })
+      .set({ country: "TD", isAdmin: true, isSuperAdmin: true })
       .where(eq(users.phone, "99935673"));
-    console.log("Super admin updated");
+    console.log("Super admin access verified");
   }
 
   // Seed/update countries (TD, CM, BF, NE, BJ)
@@ -219,11 +220,12 @@ export async function seed() {
 
   for (const settingData of requiredSettings) {
     const existing = existingSettings.find(s => s.key === settingData.key);
+    const isSensitive = /secret|key|token|password/i.test(settingData.key);
     if (!existing) {
       await db.insert(platformSettings).values(settingData);
-      console.log(`Setting added: ${settingData.key} = ${settingData.value}`);
+      console.log(`Setting added: ${settingData.key}${isSensitive ? "" : ` = ${settingData.value}`}`);
     } else {
-      console.log(`Setting preserved: ${settingData.key} = ${existing.value}`);
+      console.log(`Setting preserved: ${existing.key}${isSensitive ? "" : ` = ${existing.value}`}`);
     }
   }
   console.log("Settings check complete");

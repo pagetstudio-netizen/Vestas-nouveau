@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
 import bcrypt from "bcrypt";
-import { registerSchema, loginSchema } from "@shared/schema";
+import { registerSchema, loginSchema, depositSchema, walletSchema, phoneNumberSchema } from "@shared/schema";
 import { z } from "zod";
 import ConnectPgSimple from "connect-pg-simple";
 import { 
@@ -75,9 +75,59 @@ declare module "express-session" {
 
 const PgSession = ConnectPgSimple(session);
 const sessionDatabaseUrl = process.env.DATABASE_URL || process.env.SUPABASE_DATABASE_URL;
+const sessionSecret = process.env.SESSION_SECRET;
 
 if (!sessionDatabaseUrl) {
   throw new Error("No database URL configured for session storage.");
+}
+if (!sessionSecret) {
+  throw new Error("SESSION_SECRET must be configured.");
+}
+
+const SENSITIVE_SETTING_KEYS = new Set([
+  "sendavapayWebhookSecret",
+  "omnipayCallbackKey",
+]);
+const PUBLIC_SETTING_KEYS = new Set([
+  "supportLink", "supportType", "supportLabel",
+  "support2Link", "support2Type", "support2Label",
+  "channelLink", "channelType", "channelLabel",
+  "groupLink", "groupType", "groupLabel", "noticeText",
+  "supportEnabled", "support2Enabled", "channelEnabled", "groupEnabled",
+  "signupBonus", "minDeposit", "minWithdrawal", "withdrawalFees",
+  "maxWithdrawalsPerDay", "withdrawalStartHour", "withdrawalEndHour",
+  "level1Commission", "level2Commission", "level3Commission",
+  "sendavapayEnabled", "sendavapayChannelName",
+]);
+const ADMIN_SETTING_KEYS = new Set([
+  ...Array.from(PUBLIC_SETTING_KEYS),
+  "sendavapayWebhookSecret", "omnipayCallbackKey",
+]);
+const MASKED_SETTING_VALUE = "********";
+
+function publicSettings(settings: Record<string, string>) {
+  return Object.fromEntries(
+    Object.entries(settings).filter(([key]) => PUBLIC_SETTING_KEYS.has(key)),
+  );
+}
+
+function adminSettings(settings: Record<string, string>) {
+  return Object.fromEntries(
+    Object.entries(settings)
+      .filter(([key]) => ADMIN_SETTING_KEYS.has(key))
+      .map(([key, value]) => [
+      key,
+      SENSITIVE_SETTING_KEYS.has(key) && value ? MASKED_SETTING_VALUE : value,
+      ]),
+  );
+}
+
+function validatePhone(value: unknown, fieldName: string): string {
+  const result = phoneNumberSchema.safeParse(value);
+  if (!result.success) {
+    throw new Error(`${fieldName} invalide`);
+  }
+  return result.data;
 }
 
 function requireAuth(req: Request, res: Response, next: NextFunction) {
@@ -125,7 +175,7 @@ export async function registerRoutes(
         createTableIfMissing: true,
         pruneSessionInterval: 60 * 60,
       }),
-      secret: process.env.SESSION_SECRET || "fb2e4a19c3d87b650a12e4f98c23d17a84b6e9c5f2301a8d7bc4e506a90f3812",
+       secret: sessionSecret as string,
       resave: false,
       saveUninitialized: false,
       cookie: {
@@ -660,8 +710,12 @@ export async function registerRoutes(
       if (!ownerName || !phone || !operatorName || !country) {
         return res.status(400).json({ message: "Tous les champs sont requis" });
       }
+      const normalizedPhone = validatePhone(phone, "Numéro");
       const num = await storage.createPaymentNumber({
-        ownerName, phone, operatorName, country,
+        ownerName: String(ownerName).trim().slice(0, 100),
+        phone: normalizedPhone,
+        operatorName: String(operatorName).trim().slice(0, 60),
+        country: String(country).trim().toUpperCase(),
         logoUrl: logoUrl || null,
         isActive: isActive !== false,
         createdBy: req.session.userId,
@@ -676,7 +730,13 @@ export async function registerRoutes(
     try {
       const id = parseInt(req.params.id);
       const { ownerName, phone, operatorName, country, logoUrl, isActive } = req.body;
-      const num = await storage.updatePaymentNumber(id, { ownerName, phone, operatorName, country, logoUrl, isActive });
+      const num = await storage.updatePaymentNumber(id, {
+        ownerName: ownerName === undefined ? undefined : String(ownerName).trim().slice(0, 100),
+        phone: phone === undefined ? undefined : validatePhone(phone, "Numéro"),
+        operatorName: operatorName === undefined ? undefined : String(operatorName).trim().slice(0, 60),
+        country: country === undefined ? undefined : String(country).trim().toUpperCase(),
+        logoUrl, isActive,
+      });
       res.json(num);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -705,13 +765,29 @@ export async function registerRoutes(
 
       const settings = await storage.getSettings();
       const minDeposit = parseInt(settings.minDeposit || "3500");
-      if (amount < minDeposit) {
+       const requestedAmount = typeof amount === "number" ? amount : Number(amount);
+       if (!Number.isFinite(requestedAmount) || requestedAmount < minDeposit) {
         return res.status(400).json({ message: `Montant minimum: ${minDeposit.toLocaleString()} FCFA` });
       }
 
-      if (!accountName || !accountNumber || !paymentMethod || !country) {
-        return res.status(400).json({ message: "Tous les champs sont requis" });
-      }
+       const parsedDeposit = depositSchema.safeParse({
+          amount: requestedAmount,
+         accountName, accountNumber, paymentMethod, country,
+         paymentChannelId: paymentChannelId === undefined ? undefined : Number(paymentChannelId),
+       });
+       if (!parsedDeposit.success) {
+         return res.status(400).json({ message: parsedDeposit.error.errors[0]?.message || "Données invalides" });
+       }
+       if (screenshot !== undefined && screenshot !== null) {
+         if (
+           typeof screenshot !== "string" ||
+           screenshot.length > 7_000_000 ||
+           !/^data:image\/(?:jpeg|png|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(screenshot)
+         ) {
+           return res.status(400).json({ message: "Capture invalide ou trop volumineuse (7 Mo maximum)" });
+         }
+       }
+       const normalizedDeposit = parsedDeposit.data;
 
       const soleaspayEnabled = settings.soleaspayEnabled !== "false";
       const soleaspayCountries = settings.soleaspayCountries ? settings.soleaspayCountries.split(",").filter(Boolean) : [];
@@ -719,32 +795,32 @@ export async function registerRoutes(
       
       // Only use Soleaspay when user explicitly chose the Soleaspay channel (Westpay)
       if (useSoleaspay && soleaspayEnabled) {
-        if (!isSoleaspaySupported(country, paymentMethod)) {
+         if (!isSoleaspaySupported(normalizedDeposit.country, normalizedDeposit.paymentMethod)) {
           return res.status(400).json({
-            message: `L'opérateur "${paymentMethod}" n'est pas supporté par ce canal pour le pays "${country}". Veuillez choisir un autre canal.`,
+            message: `L'opérateur "${normalizedDeposit.paymentMethod}" n'est pas supporté par ce canal pour le pays "${normalizedDeposit.country}". Veuillez choisir un autre canal.`,
             soleaspay: true,
           });
         }
         try {
           const paymentResult = await initiatePayment(
-            accountNumber,
-            amount,
-            country,
-            paymentMethod,
+            normalizedDeposit.accountNumber,
+            normalizedDeposit.amount,
+            normalizedDeposit.country,
+            normalizedDeposit.paymentMethod,
             orderId,
-            accountName,
+            normalizedDeposit.accountName,
             `user${user.id}@intel.com`
           );
 
           if (paymentResult.success && paymentResult.data) {
             const deposit = await storage.createDeposit({
               userId: req.session.userId!,
-              amount,
-              accountName,
-              accountNumber,
-              country,
-              paymentMethod,
-              paymentChannelId: paymentChannelId > 0 ? paymentChannelId : null,
+             amount: normalizedDeposit.amount,
+             accountName: normalizedDeposit.accountName,
+             accountNumber: normalizedDeposit.accountNumber,
+             country: normalizedDeposit.country,
+             paymentMethod: normalizedDeposit.paymentMethod,
+               paymentChannelId: normalizedDeposit.paymentChannelId && normalizedDeposit.paymentChannelId > 0 ? normalizedDeposit.paymentChannelId : null,
               status: "processing",
               soleaspayReference: paymentResult.data.reference,
               soleaspayOrderId: orderId,
@@ -776,12 +852,12 @@ export async function registerRoutes(
 
       const deposit = await storage.createDeposit({
         userId: req.session.userId!,
-        amount,
-        accountName,
-        accountNumber,
-        country,
-        paymentMethod,
-        paymentChannelId: paymentChannelId && paymentChannelId > 0 ? paymentChannelId : null,
+         amount: normalizedDeposit.amount,
+         accountName: normalizedDeposit.accountName,
+         accountNumber: normalizedDeposit.accountNumber,
+         country: normalizedDeposit.country,
+         paymentMethod: normalizedDeposit.paymentMethod,
+         paymentChannelId: normalizedDeposit.paymentChannelId && normalizedDeposit.paymentChannelId > 0 ? normalizedDeposit.paymentChannelId : null,
         paymentNumberId: paymentNumberId || null,
         channelName: channelName || null,
         screenshot: screenshot || null,
@@ -1242,13 +1318,13 @@ export async function registerRoutes(
 
   app.post("/api/wallets", requireAuth, async (req, res) => {
     try {
-      const { accountName, accountNumber, paymentMethod, country } = req.body;
+      const parsedWallet = walletSchema.safeParse(req.body);
+      if (!parsedWallet.success) {
+        return res.status(400).json({ message: parsedWallet.error.errors[0]?.message || "Données invalides" });
+      }
       const wallet = await storage.createWallet({
         userId: req.session.userId!,
-        accountName,
-        accountNumber,
-        paymentMethod,
-        country,
+        ...parsedWallet.data,
       });
       res.json(wallet);
     } catch (error: any) {
@@ -1406,7 +1482,7 @@ export async function registerRoutes(
   app.get("/api/settings", async (req, res) => {
     try {
       const settings = await storage.getSettings();
-      res.json(settings);
+      res.json(publicSettings(settings));
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -1902,7 +1978,7 @@ export async function registerRoutes(
   app.get("/api/admin/settings", requireAdmin, async (req, res) => {
     try {
       const settings = await storage.getSettings();
-      res.json(settings);
+      res.json(adminSettings(settings));
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -1912,6 +1988,8 @@ export async function registerRoutes(
     try {
       const entries = Object.entries(req.body);
       for (const [key, value] of entries) {
+        if (!ADMIN_SETTING_KEYS.has(key)) continue;
+        if (SENSITIVE_SETTING_KEYS.has(key) && (value === "" || value === MASKED_SETTING_VALUE)) continue;
         await storage.setSetting(key, value as string, req.session.userId);
       }
       await storage.logAdminAction(req.session.userId!, "update_settings", null, `Paramètres modifiés`);
