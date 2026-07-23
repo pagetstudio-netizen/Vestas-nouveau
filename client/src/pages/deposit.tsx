@@ -429,7 +429,7 @@ export default function DepositPage() {
             >
               <div className="p-4 flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center flex-shrink-0">
-                  <Zap className="w-6 h-6 text-white" />
+                  <img src="/topup-icon.png" className="w-8 h-8 object-contain" alt="topup" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-gray-900 text-sm">{sendavapayChannelName}</p>
@@ -710,7 +710,7 @@ export default function DepositPage() {
           {svInitiateMutation.isPending ? (
             <span className="flex items-center justify-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Initiation en cours...</span>
           ) : (
-            <span className="flex items-center justify-center gap-2"><Zap className="w-5 h-5" /> Initier le paiement</span>
+            <span className="flex items-center justify-center gap-2"><img src="/topup-icon.png" className="w-6 h-6 object-contain" alt="topup" /> Initier le paiement</span>
           )}
         </button>
       </div>
