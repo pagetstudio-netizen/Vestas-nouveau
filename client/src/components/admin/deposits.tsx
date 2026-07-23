@@ -41,14 +41,20 @@ export default function AdminDeposits() {
     statusFilter === "all" ? true : d.status === statusFilter
   );
 
+  const [processingId, setProcessingId] = useState<number | null>(null);
+
   const processMutation = useMutation({
     mutationFn: async ({ id, action, ban }: { id: number; action: "approve" | "reject"; ban?: boolean }) => {
-      const response = await apiRequest("POST", `/api/admin/deposits/${id}/${action}`, { ban });
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Erreur");
-      }
-      return response.json();
+      setProcessingId(id);
+      const res = await fetch(`/api/admin/deposits/${id}/${action}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ban }),
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || `Erreur ${res.status}`);
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/deposits"] });
@@ -58,6 +64,7 @@ export default function AdminDeposits() {
     onError: (error: any) => {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
     },
+    onSettled: () => setProcessingId(null),
   });
 
   const filteredDeposits = deposits?.filter(d =>
@@ -217,16 +224,16 @@ export default function AdminDeposits() {
                         size="sm"
                         className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                         onClick={() => processMutation.mutate({ id: deposit.id, action: "approve" })}
-                        disabled={processMutation.isPending}
+                        disabled={processingId === deposit.id}
                         data-testid={`button-approve-${deposit.id}`}
                       >
-                        {processMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" />Valider</>}
+                        {processingId === deposit.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" />Valider</>}
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => processMutation.mutate({ id: deposit.id, action: "reject" })}
-                        disabled={processMutation.isPending}
+                        disabled={processingId === deposit.id}
                         data-testid={`button-reject-${deposit.id}`}
                       >
                         <X className="w-4 h-4 mr-1" />Rejeter
@@ -235,7 +242,7 @@ export default function AdminDeposits() {
                         size="sm"
                         variant="destructive"
                         onClick={() => processMutation.mutate({ id: deposit.id, action: "reject", ban: true })}
-                        disabled={processMutation.isPending}
+                        disabled={processingId === deposit.id}
                         title="Rejeter et bannir"
                         data-testid={`button-ban-${deposit.id}`}
                       >

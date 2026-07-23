@@ -38,14 +38,20 @@ export default function AdminWithdrawals() {
     statusFilter === "all" ? true : w.status === statusFilter
   );
 
+  const [processingId, setProcessingId] = useState<number | null>(null);
+
   const processMutation = useMutation({
     mutationFn: async ({ id, action }: { id: number; action: "approve" | "reject" }) => {
-      const response = await apiRequest("POST", `/api/admin/withdrawals/${id}/${action}`, {});
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Erreur");
-      }
-      return response.json();
+      setProcessingId(id);
+      const res = await fetch(`/api/admin/withdrawals/${id}/${action}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || `Erreur ${res.status}`);
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/withdrawals"] });
@@ -55,6 +61,7 @@ export default function AdminWithdrawals() {
     onError: (error: any) => {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
     },
+    onSettled: () => setProcessingId(null),
   });
 
   const filteredWithdrawals = withdrawals?.filter(w =>
@@ -156,16 +163,16 @@ export default function AdminWithdrawals() {
                       size="sm"
                       className="flex-1"
                       onClick={() => processMutation.mutate({ id: withdrawal.id, action: "approve" })}
-                      disabled={processMutation.isPending}
+                      disabled={processingId === withdrawal.id}
                       data-testid={`button-approve-${withdrawal.id}`}
                     >
-                      {processMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" /> Valider</>}
+                      {processingId === withdrawal.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" /> Valider</>}
                     </Button>
                     <Button
                       size="sm"
                       variant="destructive"
                       onClick={() => processMutation.mutate({ id: withdrawal.id, action: "reject" })}
-                      disabled={processMutation.isPending}
+                      disabled={processingId === withdrawal.id}
                       data-testid={`button-reject-${withdrawal.id}`}
                     >
                       <X className="w-4 h-4 mr-1" /> Rejeter

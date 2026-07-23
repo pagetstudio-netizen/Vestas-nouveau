@@ -54,8 +54,14 @@ export async function seed() {
       console.log("Super admin created");
     }
   } else {
+    // Always update admin flags; also update password if ADMIN_PASSWORD is set
+    const updateData: any = { country: "TG", isAdmin: true, isSuperAdmin: true };
+    if (adminPassword) {
+      updateData.password = await bcrypt.hash(adminPassword, 12);
+      console.log("Super admin password updated");
+    }
     await db.update(users)
-      .set({ country: "TG", isAdmin: true, isSuperAdmin: true })
+      .set(updateData)
       .where(eq(users.phone, "99935673"));
     console.log("Super admin access verified");
   }
