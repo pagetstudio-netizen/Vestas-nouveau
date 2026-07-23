@@ -31,7 +31,7 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       phone: "",
-      country: "TD",
+      country: "TG",
       password: "",
     },
   });
@@ -53,7 +53,7 @@ export default function LoginPage() {
     const isValid = apiCountries.some(ac => ac.code === selectedCountry && ac.isActive);
     // Keep a remembered/selected country long enough for the server to apply
     // the administrator-only cross-country login rule.
-    if (!isValid && !selectedCountry) {
+    if (!isValid) {
       const first = apiCountries.find(ac => ac.isActive);
       if (first) form.setValue("country", first.code);
     }
