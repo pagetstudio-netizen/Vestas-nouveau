@@ -1,19 +1,19 @@
 import { useLocation } from "wouter";
 
 import iconHome from "@assets/20260312_091332_1773307680527.png";
-import iconProduit from "@assets/20251231_093102_1771507041600-D0EaRzg7_1783245289157.png";
 import iconEquipe from "@assets/1244758_1783246767217.png";
 import iconCompte from "@assets/téléchargement_(12)_1770815897017.png";
 
-const navItems = [
-  { path: "/", label: "Accueil", icon: iconHome },
-  { path: "/my-products", label: "Produit", icon: iconProduit },
-  { path: "/team", label: "Partage", icon: iconEquipe },
-  { path: "/account", label: "Compte", icon: iconCompte },
-];
+const blueFilter   = "brightness(0) saturate(100%) invert(25%) sepia(90%) saturate(1500%) hue-rotate(190deg) brightness(100%)";
+const purpleFilter = "brightness(0) saturate(100%) invert(28%) sepia(80%) saturate(2000%) hue-rotate(255deg) brightness(105%)";
+const grayFilter   = "brightness(0) saturate(0%) opacity(40%)";
 
-const blueFilter = "brightness(0) saturate(100%) invert(25%) sepia(90%) saturate(1500%) hue-rotate(190deg) brightness(100%)";
-const grayFilter = "brightness(0) saturate(0%) opacity(40%)";
+const navItems = [
+  { path: "/",            label: "Accueil", icon: iconHome,                 activeFilter: blueFilter },
+  { path: "/my-products", label: "Produit", icon: "/icon-produit.png",      activeFilter: purpleFilter },
+  { path: "/team",        label: "Partage", icon: iconEquipe,               activeFilter: blueFilter },
+  { path: "/account",     label: "Compte",  icon: iconCompte,               activeFilter: blueFilter },
+];
 
 export default function BottomNav() {
   const [location, navigate] = useLocation();
@@ -40,11 +40,11 @@ export default function BottomNav() {
                 src={item.icon}
                 alt={item.label}
                 className="w-8 h-8 mb-0.5"
-                style={{ filter: isActive ? blueFilter : grayFilter }}
+                style={{ filter: isActive ? item.activeFilter : grayFilter }}
               />
               <span
                 className="text-[10px] font-medium"
-                style={{ color: isActive ? "#003366" : "#6b7280" }}
+                style={{ color: isActive ? (item.activeFilter === purpleFilter ? "#7C3AED" : "#003366") : "#6b7280" }}
               >
                 {item.label}
               </span>
