@@ -1,5 +1,4 @@
 import { useAuth } from "@/lib/auth";
-import { SiTelegram } from "react-icons/si";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -8,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 
 import jollibeeLogo  from "@assets/6790d8bd04714fedd7593cb6_Doosan_Group_and_Corporation_-_Logo.s_1784561452870.png";
 import heroImg       from "@assets/téléchargement_(16)_1784561452683.jpeg";
-import bellIcon      from "@assets/d7d9f6f6-dddc-4071-8bc2-d6e7e589fbae_(1)_1783248684110.png";
 import iconBell      from "@assets/d68b81d4-3a8a-4ba0-804f-d77f381cb5ab_1784756497520.png";
 import iconSignin    from "@assets/icon-signin.png";
 import bgDoosan      from "@assets/téléchargement_(18)_1784756497633.jpeg";
@@ -112,51 +110,42 @@ export default function HomePage() {
       {/* ── POPUP NOTIFICATION ── */}
       {showPopup && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-5"
-          style={{ background: "rgba(0,0,0,0.82)" }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
+          style={{ background: "rgba(0,0,0,0.55)" }}
           onClick={() => setShowPopup(false)}
         >
           <div
-            className="w-full max-w-[340px] rounded-3xl overflow-hidden shadow-2xl"
-            style={{ background: "#111827" }}
+            className="w-full max-w-[320px] bg-white rounded-2xl overflow-hidden shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex justify-center pt-7 pb-2">
-              <img src={bellIcon} alt="Notification" className="w-24 h-24 object-contain" />
+            {/* Body */}
+            <div className="px-6 pt-7 pb-5 text-center">
+              <p className="text-gray-800 font-semibold text-base leading-snug">
+                {noticeText}
+              </p>
             </div>
-            <p className="text-white font-extrabold text-xl text-center tracking-widest mb-4">NOTIFICATION</p>
-            <div className="px-6 pb-2 space-y-2">
-              {[
-                `Prime d'inscription : ${parseInt(signupBonus).toLocaleString()} FCFA.`,
-                `Récompense de connexion quotidienne : 50 FCFA.`,
-                `Invitez vos subordonnés à investir et recevez une récompense en espèces de ${level1Commission}% du montant de leur investissement.`,
-                `Il n'y a aucune limite quant au temps de retrait ou au nombre de retraits. Vous pouvez retirer de l'argent à tout moment.`,
-                `Doosan attache une grande importance au marché.`,
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <span className="text-white/60 text-xs font-bold mt-0.5 shrink-0">{i + 1}.</span>
-                  <p className="text-white/85 text-xs leading-relaxed">{item}</p>
-                </div>
-              ))}
-            </div>
-            <div className="px-5 pt-5 pb-6 space-y-3">
+
+            {/* Divider */}
+            <div className="h-px bg-gray-100" />
+
+            {/* Buttons */}
+            <div className="flex">
               <button
                 onClick={() => setShowPopup(false)}
-                className="w-full py-3.5 bg-white rounded-full font-extrabold text-base text-gray-900"
+                className="flex-1 py-4 text-gray-500 font-semibold text-sm border-r border-gray-100"
                 data-testid="button-popup-agree"
               >
-                OK
+                Fermer
               </button>
               <a
                 href={telegramGroupLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full font-bold text-sm text-white"
-                style={{ background: "linear-gradient(90deg, #6d28d9, #7c3aed)" }}
+                className="flex-1 py-4 text-white font-bold text-sm flex items-center justify-center gap-1.5"
+                style={{ background: "#16a34a" }}
                 onClick={() => setShowPopup(false)}
               >
-                <SiTelegram className="w-4 h-4" />
-                Aller sur Telegram &gt;
+                Rejoindre
               </a>
             </div>
           </div>
