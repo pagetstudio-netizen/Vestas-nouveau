@@ -605,7 +605,7 @@ export default function DepositPage() {
       <header className="flex items-center justify-between px-4 py-4 bg-white border-b border-gray-100">
         <button className="flex items-center gap-1 text-gray-800" onClick={() => setStep("amount")}>
           <ChevronLeft className="w-5 h-5" />
-          <span className="font-semibold text-base">{sendavapayChannelName}</span>
+          <span className="font-semibold text-base">Top up</span>
         </button>
         <Link href="/deposit-history">
           <button className="text-xs text-[#003366] font-semibold px-3 py-1.5 rounded-full border border-[#003366]">Historique</button>
