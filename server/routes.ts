@@ -74,6 +74,11 @@ declare module "express-session" {
 }
 
 const PgSession = ConnectPgSimple(session);
+const sessionDatabaseUrl = process.env.DATABASE_URL || process.env.SUPABASE_DATABASE_URL;
+
+if (!sessionDatabaseUrl) {
+  throw new Error("No database URL configured for session storage.");
+}
 
 function requireAuth(req: Request, res: Response, next: NextFunction) {
   if (!req.session.userId) {
@@ -115,7 +120,7 @@ export async function registerRoutes(
   app.use(
     session({
       store: new PgSession({
-        conString: process.env.DATABASE_URL,
+        conString: sessionDatabaseUrl,
         tableName: "session",
         createTableIfMissing: true,
         pruneSessionInterval: 60 * 60,

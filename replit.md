@@ -84,13 +84,13 @@ Preferred communication style: Simple, everyday language.
 - **TypeScript**: Type checking across full stack
 
 ### Environment Variables Required
-- `DATABASE_URL`: PostgreSQL connection string
+- `SUPABASE_DATABASE_URL` or `DATABASE_URL`: PostgreSQL connection string used for application data and sessions
 - `SESSION_SECRET`: Secret for session encryption (optional, has fallback)
 
 ## Running on Replit
 
 ### Prerequisites
-- The Replit built-in PostgreSQL database is used — `DATABASE_URL` is set automatically.
+- The application can use the existing Supabase PostgreSQL database through `SUPABASE_DATABASE_URL` (or `DATABASE_URL`).
 - `SESSION_SECRET` is configured as a Replit Secret.
 
 ### First-time setup
