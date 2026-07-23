@@ -60,75 +60,57 @@ export async function seed() {
     console.log("Super admin access verified");
   }
 
-  // Seed/update countries (TG, CM, BF, NE, BJ)
-  const requiredCountries = [
-    {
-      code: "TG",
-      name: "Togo",
-      currency: "XOF",
-      phonePrefix: "228",
-      operators: JSON.stringify(["Togocel", "Moov Africa Togo"]),
-      isActive: true,
-    },
-    {
-      code: "CM",
-      name: "Cameroun",
-      currency: "XAF",
-      phonePrefix: "237",
-      operators: JSON.stringify(["Orange Cameroun", "MTN Cameroun"]),
-      isActive: true,
-    },
-    {
-      code: "BF",
-      name: "Burkina Faso",
-      currency: "XOF",
-      phonePrefix: "226",
-      operators: JSON.stringify(["Orange Burkina", "Moov Africa Burkina"]),
-      isActive: true,
-    },
-    {
-      code: "NE",
-      name: "Niger",
-      currency: "XOF",
-      phonePrefix: "227",
-      operators: JSON.stringify(["NITA TRANSFERT", "AMANA TRANSFERT"]),
-      isActive: true,
-    },
-    {
-      code: "BJ",
-      name: "Benin",
-      currency: "XOF",
-      phonePrefix: "229",
-      operators: JSON.stringify(["MTN Benin", "Moov Africa Benin"]),
-      isActive: true,
-    },
-  ];
-
-  // Deactivate old countries no longer in the list
-  const activeCodes = requiredCountries.map(c => c.code);
-  const allCountries = await db.select().from(countries);
-  for (const c of allCountries) {
-    if (!activeCodes.includes(c.code) && c.isActive) {
-      await db.update(countries).set({ isActive: false }).where(eq(countries.code, c.code));
-      console.log(`Country deactivated: ${c.name}`);
-    }
-  }
-
-  for (const countryData of requiredCountries) {
-    const existing = await db.select().from(countries).where(eq(countries.code, countryData.code));
-    if (existing.length === 0) {
+  // Seed countries only on first install — never overwrite admin changes
+  const existingCountries = await db.select().from(countries);
+  if (existingCountries.length === 0) {
+    const defaultCountries = [
+      {
+        code: "TG",
+        name: "Togo",
+        currency: "XOF",
+        phonePrefix: "228",
+        operators: JSON.stringify(["Togocel", "Moov Africa Togo"]),
+        isActive: true,
+      },
+      {
+        code: "CM",
+        name: "Cameroun",
+        currency: "XAF",
+        phonePrefix: "237",
+        operators: JSON.stringify(["Orange Cameroun", "MTN Cameroun"]),
+        isActive: true,
+      },
+      {
+        code: "BF",
+        name: "Burkina Faso",
+        currency: "XOF",
+        phonePrefix: "226",
+        operators: JSON.stringify(["Orange Burkina", "Moov Africa Burkina"]),
+        isActive: true,
+      },
+      {
+        code: "NE",
+        name: "Niger",
+        currency: "XOF",
+        phonePrefix: "227",
+        operators: JSON.stringify(["NITA TRANSFERT", "AMANA TRANSFERT"]),
+        isActive: true,
+      },
+      {
+        code: "BJ",
+        name: "Benin",
+        currency: "XOF",
+        phonePrefix: "229",
+        operators: JSON.stringify(["MTN Benin", "Moov Africa Benin"]),
+        isActive: true,
+      },
+    ];
+    for (const countryData of defaultCountries) {
       await db.insert(countries).values(countryData);
       console.log(`Country added: ${countryData.name}`);
-    } else {
-      await db.update(countries).set({
-        name: countryData.name,
-        currency: countryData.currency,
-        phonePrefix: countryData.phonePrefix,
-        operators: countryData.operators,
-        isActive: countryData.isActive,
-      }).where(eq(countries.code, countryData.code));
-      console.log(`Country updated: ${countryData.name}`);
     }
+  } else {
+    console.log(`Countries skipped — ${existingCountries.length} existing countries preserved`);
   }
 
   // Seed products only if table is empty (first install only — never overwrite admin changes)
