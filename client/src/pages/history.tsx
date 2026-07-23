@@ -254,7 +254,7 @@ export default function HistoryPage() {
                   </div>
                 </div>
 
-                {isPendingDeposit(deposit) && (
+                {isPendingDeposit(deposit) && !deposit.sendavapayReference && (
                   <div className="px-4 pb-3">
                     <button
                       onClick={() => handleVerify(deposit.id)}
