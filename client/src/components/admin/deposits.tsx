@@ -21,6 +21,26 @@ interface DepositWithUser extends Deposit {
   };
 }
 
+// Build a unified reference string for a deposit (mirrors history.tsx logic)
+function getDepositRef(d: DepositWithUser): string {
+  const sv = (d as any).sendavapayReference;
+  const omRef = (d as any).omnipayReference;
+  const omId  = (d as any).omnipayId;
+  const soRef = (d as any).soleaspayReference;
+  const soOrd = (d as any).soleaspayOrderId;
+  const plain = (d as any).reference;
+  if (sv)    return sv.startsWith("sdk")    ? sv    : `sdk${sv}`;
+  if (omRef) return omRef.startsWith("sdk") ? omRef : `sdk${omRef}`;
+  if (omId)  return `sdk${omId}`;
+  if (soRef) return soRef.startsWith("sdk") ? soRef : `sdk${soRef}`;
+  if (soOrd) return `sdk${soOrd}`;
+  if (plain) return plain;
+  // fallback: generated from id + date
+  const dt = new Date(d.createdAt);
+  const pad = (n: number, l = 2) => String(n).padStart(l, "0");
+  return `sdk${String(dt.getFullYear()).slice(2)}${pad(dt.getMonth()+1)}${pad(dt.getDate())}${pad(dt.getHours())}${pad(dt.getMinutes())}D${pad(d.id, 4)}`;
+}
+
 export default function AdminDeposits() {
   const { toast } = useToast();
   const [filter, setFilter] = useState("");
