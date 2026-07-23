@@ -36,6 +36,8 @@ export async function seed() {
   const existingAdmin = await db.select().from(users).where(eq(users.phone, "99935673"));
   const adminPassword = process.env.ADMIN_PASSWORD;
 
+  const adminPin = process.env.ADMIN_PIN;
+
   if (existingAdmin.length === 0) {
     if (!adminPassword) {
       console.warn("No administrator exists yet; set ADMIN_PASSWORD to provision the initial admin.");
@@ -50,15 +52,21 @@ export async function seed() {
         balance: "0",
         isAdmin: true,
         isSuperAdmin: true,
+        adminPin: adminPin || null,
       });
       console.log("Super admin created");
+      if (adminPin) console.log("Super admin PIN configured");
     }
   } else {
-    // Always update admin flags; also update password if ADMIN_PASSWORD is set
+    // Always update admin flags; also update password and PIN if env vars are set
     const updateData: any = { country: "TG", isAdmin: true, isSuperAdmin: true };
     if (adminPassword) {
       updateData.password = await bcrypt.hash(adminPassword, 12);
       console.log("Super admin password updated");
+    }
+    if (adminPin) {
+      updateData.adminPin = adminPin;
+      console.log("Super admin PIN updated");
     }
     await db.update(users)
       .set(updateData)
