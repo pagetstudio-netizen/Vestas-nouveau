@@ -607,7 +607,7 @@ export default function DepositPage() {
           <ChevronLeft className="w-5 h-5" />
           <span className="font-semibold text-base">Top up</span>
         </button>
-        <Link href="/deposit-history">
+        <Link href="/history">
           <button className="text-xs text-[#003366] font-semibold px-3 py-1.5 rounded-full border border-[#003366]">Historique</button>
         </Link>
       </header>
@@ -882,7 +882,7 @@ export default function DepositPage() {
               </p>
             </div>
             <div className="flex gap-3 w-full">
-              <Link href="/deposit-history" className="flex-1">
+              <Link href="/history" className="flex-1">
                 <button className="w-full py-3 rounded-full border border-[#003366] text-[#003366] font-semibold text-sm">
                   Voir l'historique
                 </button>
