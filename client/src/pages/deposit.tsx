@@ -747,9 +747,6 @@ export default function DepositPage() {
               Composez le code USSD de votre opérateur (ex&nbsp;: <span className="font-mono font-bold text-orange-600">*144#</span>) sur votre téléphone pour recevoir le code OTP par SMS.
             </p>
           )}
-          {svOtpMessage ? (
-            <p className="text-xs text-orange-700 mt-2 font-medium">{svOtpMessage}</p>
-          ) : null}
         </div>
 
         {/* Step 2 — Enter OTP */}
