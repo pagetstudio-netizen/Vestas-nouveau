@@ -330,6 +330,7 @@ export default function DepositPage() {
     if (n.includes("orange")) return "/operators/orange.png";
     if (n.includes("mtn")) return "/operators/mtn.png";
     if (n.includes("airtel")) return "/operators/airtel.png";
+    if (n.includes("wave")) return "/operators/wave.png";
     return null;
   };
 
