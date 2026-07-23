@@ -58,7 +58,9 @@ export default function AdminDeposits() {
   });
 
   const deposits = allDeposits?.filter(d =>
-    statusFilter === "all" ? true : d.status === statusFilter
+    statusFilter === "all" ? true :
+    statusFilter === "pending" ? (d.status === "pending" || d.status === "processing") :
+    d.status === statusFilter
   );
 
   const [processingId, setProcessingId] = useState<number | null>(null);
@@ -96,7 +98,7 @@ export default function AdminDeposits() {
     String(d.id).includes(filter)
   ) || [];
 
-  const pendingCount = allDeposits?.filter(d => d.status === "pending").length || 0;
+  const pendingCount = allDeposits?.filter(d => d.status === "pending" || d.status === "processing").length || 0;
 
   return (
     <div className="space-y-4">
