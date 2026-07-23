@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCountryByCode } from "@/lib/countries";
-import { ChevronLeft, Loader2, RefreshCw } from "lucide-react";
+import { ChevronLeft, Loader2, RefreshCw, Copy } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
@@ -75,14 +75,27 @@ const getStatusInfo = (status: string) => {
   switch (status) {
     case "completed":
     case "approved":
-      return { label: "Réussi",      bg: "#16a34a" };
+      return { label: "Approuvé",       textColor: "#16a34a", badgeBg: "#dcfce7", badgeText: "#15803d" };
     case "rejected":
-      return { label: "Échoué",      bg: "#dc2626" };
+      return { label: "Rejeté",         textColor: "#dc2626", badgeBg: "#fee2e2", badgeText: "#b91c1c" };
     case "processing":
-      return { label: "En traitement", bg: "#d97706" };
+      return { label: "En traitement",  textColor: "#d97706", badgeBg: "#fef3c7", badgeText: "#b45309" };
     default:
-      return { label: "En attente",  bg: "#d97706" };
+      return { label: "En attente...",  textColor: "#d97706", badgeBg: "#fef3c7", badgeText: "#b45309" };
   }
+};
+
+const CARD_GREEN = "#3d9e4e";
+
+function copyToClipboard(text: string, toast: ReturnType<typeof useToast>["toast"]) {
+  navigator.clipboard.writeText(text).then(() =>
+    toast({ title: "Copié !", description: text, duration: 1500 })
+  );
+}
+
+const formatDateShort = (dateString: string) => {
+  const d = new Date(dateString);
+  return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
 };
 
 export default function HistoryPage() {
@@ -177,7 +190,7 @@ export default function HistoryPage() {
       </div>
 
       {/* ── Content ── */}
-      <div className="flex-1 overflow-y-auto px-6 pb-8 space-y-3">
+      <div className="flex-1 overflow-y-auto px-4 pb-8 space-y-3" style={{ background: "#f0f2f5", borderRadius: "16px 16px 0 0", marginTop: 2 }}>
 
         {isLoading ? (
           <div className="flex justify-center py-16">
@@ -192,57 +205,52 @@ export default function HistoryPage() {
 
         ) : activeTab === "deposits" ? (
           deposits.map((deposit) => {
-            const { label: statusLabel, bg: statusBg } = getStatusInfo(deposit.status);
+            const { label: statusLabel, badgeBg, badgeText } = getStatusInfo(deposit.status);
             const ref = getDepositRef(deposit);
             const amt = parseFloat(deposit.amount);
             return (
               <div
                 key={deposit.id}
-                className="rounded-2xl overflow-hidden shadow-lg"
-                style={{ background: "#1a1f2e" }}
+                className="rounded-xl overflow-hidden shadow-md"
+                style={{ background: "#fff", border: "1px solid #e5e7eb" }}
                 data-testid={`deposit-item-${deposit.id}`}
               >
-                {/* Colored header row */}
+                {/* Green header — reference + copy icon */}
                 <div
-                  className="flex items-center justify-between px-4 py-3"
-                  style={{ background: "linear-gradient(90deg, #5c35c8, #3b1fa8)" }}
+                  className="flex items-center gap-2 px-4 py-2.5"
+                  style={{ background: CARD_GREEN }}
                 >
-                  <span className="text-white font-bold text-base">Dépôt</span>
-                  <span className="text-white font-bold text-base">
-                    {currency} {amt.toLocaleString("fr-FR")}
-                  </span>
+                  <span className="text-white text-xs font-semibold shrink-0">Numéro de commande:</span>
+                  <span className="text-white text-xs font-bold flex-1 min-w-0 truncate">{ref}</span>
+                  <button
+                    onClick={() => copyToClipboard(ref, toast)}
+                    className="shrink-0 text-white/80 hover:text-white active:scale-95 transition-transform"
+                    data-testid={`button-copy-${deposit.id}`}
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
                 </div>
 
-                {/* Body rows */}
-                <div className="px-4 py-3 space-y-2.5">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">N° de commande :</span>
-                    <span className="text-white text-sm font-medium text-right ml-2 break-all">{ref}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">Montant de la commande :</span>
-                    <span className="text-white text-sm font-medium">
-                      {currency} {amt.toLocaleString("fr-FR")}
+                {/* Body */}
+                <div className="px-4 py-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 text-sm">Montant</span>
+                    <span className="text-red-500 font-bold text-sm">
+                      {amt.toLocaleString("fr-FR")} {currency}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">Montant reçu :</span>
-                    <span className="text-white text-sm font-medium">
-                      {currency} {amt.toLocaleString("fr-FR")}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">Heure :</span>
-                    <span className="text-white text-sm font-medium">{formatDate(deposit.createdAt)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">Statut :</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 text-sm">Condition</span>
                     <span
-                      className="text-white text-xs font-bold px-4 py-1 rounded-lg"
-                      style={{ background: statusBg }}
+                      className="text-xs font-bold px-3 py-1 rounded-full max-w-[130px] truncate"
+                      style={{ background: badgeBg, color: badgeText }}
                     >
                       {statusLabel}
                     </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 text-sm">Date</span>
+                    <span className="text-gray-700 text-sm font-medium">{formatDateShort(deposit.createdAt)}</span>
                   </div>
                 </div>
 
@@ -252,7 +260,7 @@ export default function HistoryPage() {
                       onClick={() => handleVerify(deposit.id)}
                       disabled={verifyingId === deposit.id}
                       className="w-full py-2 text-white text-xs font-bold rounded-full flex items-center justify-center gap-2 disabled:opacity-50"
-                      style={{ background: "#1976D2" }}
+                      style={{ background: CARD_GREEN }}
                       data-testid={`button-verify-${deposit.id}`}
                     >
                       {verifyingId === deposit.id
@@ -268,58 +276,52 @@ export default function HistoryPage() {
 
         ) : (
           withdrawals.map((withdrawal) => {
-            const { label: statusLabel, bg: statusBg } = getStatusInfo(withdrawal.status);
+            const { label: statusLabel, badgeBg, badgeText } = getStatusInfo(withdrawal.status);
             const ref = getWithdrawalRef(withdrawal);
             const gross = parseFloat(withdrawal.amount);
-            const net   = parseFloat(withdrawal.netAmount || withdrawal.amount);
             return (
               <div
                 key={withdrawal.id}
-                className="rounded-2xl overflow-hidden shadow-lg"
-                style={{ background: "#1a1f2e" }}
+                className="rounded-xl overflow-hidden shadow-md"
+                style={{ background: "#fff", border: "1px solid #e5e7eb" }}
                 data-testid={`withdrawal-item-${withdrawal.id}`}
               >
-                {/* Colored header row */}
+                {/* Green header — reference + copy icon */}
                 <div
-                  className="flex items-center justify-between px-4 py-3"
-                  style={{ background: "linear-gradient(90deg, #5c35c8, #3b1fa8)" }}
+                  className="flex items-center gap-2 px-4 py-2.5"
+                  style={{ background: CARD_GREEN }}
                 >
-                  <span className="text-white font-bold text-base">Retrait</span>
-                  <span className="text-white font-bold text-base">
-                    {currency} {gross.toLocaleString("fr-FR")}
-                  </span>
+                  <span className="text-white text-xs font-semibold shrink-0">Numéro de commande:</span>
+                  <span className="text-white text-xs font-bold flex-1 min-w-0 truncate">{ref}</span>
+                  <button
+                    onClick={() => copyToClipboard(ref, toast)}
+                    className="shrink-0 text-white/80 hover:text-white active:scale-95 transition-transform"
+                    data-testid={`button-copy-w-${withdrawal.id}`}
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
                 </div>
 
-                {/* Body rows */}
-                <div className="px-4 py-3 space-y-2.5">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">N° de commande :</span>
-                    <span className="text-white text-sm font-medium text-right ml-2 break-all">{ref}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">Montant de la commande :</span>
-                    <span className="text-white text-sm font-medium">
-                      {currency} {gross.toLocaleString("fr-FR")}
+                {/* Body */}
+                <div className="px-4 py-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 text-sm">Montant</span>
+                    <span className="text-red-500 font-bold text-sm">
+                      {gross.toLocaleString("fr-FR")} {currency}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">Montant reçu :</span>
-                    <span className="text-white text-sm font-medium">
-                      {currency} {net.toLocaleString("fr-FR")}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">Heure :</span>
-                    <span className="text-white text-sm font-medium">{formatDate(withdrawal.createdAt)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">Statut :</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 text-sm">Condition</span>
                     <span
-                      className="text-white text-xs font-bold px-4 py-1 rounded-lg"
-                      style={{ background: statusBg }}
+                      className="text-xs font-bold px-3 py-1 rounded-full max-w-[130px] truncate"
+                      style={{ background: badgeBg, color: badgeText }}
                     >
                       {statusLabel}
                     </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 text-sm">Date</span>
+                    <span className="text-gray-700 text-sm font-medium">{formatDateShort(withdrawal.createdAt)}</span>
                   </div>
                 </div>
               </div>
